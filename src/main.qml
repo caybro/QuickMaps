@@ -322,6 +322,7 @@ ApplicationWindow {
         checkable: true
         checked: mainWindow.visibility == Window.FullScreen
         onTriggered: toggleFullscreen()
+        enabled: !mobile
     }
 
     toolBar: ToolBar {
@@ -359,6 +360,7 @@ ApplicationWindow {
             Item { Layout.preferredWidth: 10 }
             ToolButton {
                 action: fullscreenAction
+                visible: !mobile
             }
         }
     }
