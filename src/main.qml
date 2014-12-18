@@ -46,6 +46,8 @@ ApplicationWindow {
             print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
             mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
         }
+
+        //positionSource.update()
     }
 
     SystemPalette {
@@ -179,7 +181,7 @@ ApplicationWindow {
 
 //    PositionSource {
 //        id: positionSource
-//        active: true
+//        active: false
 
 //        onPositionChanged: {
 //            var coord = position.coordinate;
@@ -239,6 +241,8 @@ ApplicationWindow {
             if (status == GeocodeModel.Ready) {
                 print("Query returned " + count + " items")
                 if (count == 1) {
+                    map.visible = true
+                    resultsView.visible = false
                     var currentPlace = get(0);
                     map.clearMapItems();
                     print("Selecting " + currentPlace.address.text);
