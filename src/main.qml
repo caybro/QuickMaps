@@ -20,12 +20,12 @@ ApplicationWindow {
         property alias y: mainWindow.y
         property alias width: mainWindow.width
         property alias height: mainWindow.height
+        // startup coords
+        property real latitude: initialLatitude
+        property real longitude: initialLongitude
+        // zoom level
+        property alias zoom: map.zoomLevel
     }
-
-    //    Component.onDestruction: {
-    //        settings.volume = player.volume
-    //        settings.lastDirUrl = fileDialog.folder
-    //    }
 
     Component.onCompleted: {
         print("Available services: " + plugin.availableServiceProviders)
@@ -39,10 +39,12 @@ ApplicationWindow {
         print("Supports dynamic routing, based on current position: " + plugin.supportsRouting(Plugin.RouteUpdatesFeature))
         print("Supports routing alternatives: " + plugin.supportsRouting(Plugin.AlternativeRoutesFeature))
 
-        print("Supported map types:")
-        for (var i = 0; i<map.supportedMapTypes.length; i++){
-            print("\t" + map.supportedMapTypes[i].name + "(" + map.supportedMapTypes[i].description + ")");
-            mapTypeModel.append({"name": map.supportedMapTypes[i].name, "data": map.supportedMapTypes[i]});
+        var maps = map.supportedMapTypes;
+        print("Supported map types: " + maps.length)
+        for (var i = 0; i < maps.length; i++){
+            print(maps[i].name + " (" + maps[i].description + ")");
+            print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
+            mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
         }
     }
 
@@ -53,9 +55,15 @@ ApplicationWindow {
     Plugin {
         id: plugin
         preferred: ["nokia", "osm"]
-        name: "osm"
-        //required: Plugin.GeocodingFeature | Plugin.ReverseGeocodingFeature | Plugin.MappingFeature // read-only, wtf? :)
-        PluginParameter {name: "useragent"; value: "QuickMaps" }
+        PluginParameter { name: "app_id"; value: "KvjgeyL7z4SoEo3WpDlr" }
+        PluginParameter { name: "token"; value: "silNtd28g7LA6L_hSDwBMQ" }
+        PluginParameter { name: "useragent"; value: "QuickMaps" }
+    }
+
+    Plugin {
+        id: geocodePlugin
+        name: "osm" // the nokia geocode plugin seems to always return only 1 result...
+        PluginParameter { name: "useragent"; value: "QuickMaps" }
     }
 
     ListModel {
@@ -71,9 +79,12 @@ ApplicationWindow {
         textRole: "name"
         z: map.z + 1
         visible: map.visible
+        implicitWidth: 200
         onCurrentIndexChanged: {
-            if (currentText != "")
+            if (currentText != "") {
                 map.activeMapType = model.get(currentIndex).data
+                map.update()
+            }
         }
     }
 
@@ -166,21 +177,20 @@ ApplicationWindow {
         }
     }
 
-    PositionSource {
-        id: positionSource
-        active: true
+//    PositionSource {
+//        id: positionSource
+//        active: true
 
-        onPositionChanged: {
-            var coord = position.coordinate;
-            console.log("Coordinate:", coord.longitude, coord.latitude);
-        }
-    }
+//        onPositionChanged: {
+//            var coord = position.coordinate;
+//            console.log("Coordinate:", coord.latitude, coord.longitude);
+//        }
+//    }
 
     Map {
         id: map
         anchors.fill: parent
         plugin: plugin
-        center: QtPositioning.coordinate(49.6843842, 17.2190358)
 //        property bool lastZoomWasIn: true
 //        onZoomLevelChanged: {
 //            print("Current zoom level: " + zoomLevel)
@@ -207,13 +217,23 @@ ApplicationWindow {
                 source: "qrc:/marker.png"
             }
         }
-    }
 
+        Component.onDestruction: {
+            settings.latitude = map.center.latitude
+            settings.longitude = map.center.longitude
+        }
+
+        Component.onCompleted: {
+            map.center.latitude = settings.latitude
+            map.center.longitude = settings.longitude
+        }
+    }
 
     GeocodeModel {
         id: geocodeModel
-        plugin: plugin
+        plugin: geocodePlugin
         autoUpdate: false
+        limit: 20
 
         onStatusChanged: {
             if (status == GeocodeModel.Ready) {
@@ -236,12 +256,6 @@ ApplicationWindow {
             }
         }
     }
-
-    //    Timer {
-    //        id: messageTimer
-    //        interval: 3000 // 3 seconds
-    //        onTriggered: messageLabel.text = player.source
-    //    }
 
     Action {
         id: quitAction
@@ -276,14 +290,6 @@ ApplicationWindow {
     }
 
     Action {
-        id: goForwardAction
-        text: qsTr("&Forward")
-        tooltip: text.replace('&', '') + " (" + shortcut + ")"
-        iconName: "go-next"
-        shortcut: StandardKey.Forward
-    }
-
-    Action {
         id: goHomeAction
         text: qsTr("&Home")
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
@@ -312,9 +318,6 @@ ApplicationWindow {
             ToolButton {
                 action: goBackAction
             }
-//            ToolButton {
-//                action: goForwardAction
-//            }
             Item { Layout.preferredWidth: 10 }
             Label {
                 text: qsTr("Query:")

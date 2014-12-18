@@ -5,7 +5,6 @@
 #include <QQmlContext>
 #include <QStandardPaths>
 #include <QCommandLineParser>
-#include <QDir>
 #include <QDebug>
 
 int main(int argc, char *argv[])
@@ -22,32 +21,20 @@ int main(int argc, char *argv[])
     app.installTranslator(&appTrans);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(QApplication::tr("Simple maps application based on QML"));
+    parser.setApplicationDescription(QApplication::tr("Simple maps application based on QML") + "\n(c) 2014 Lukáš Tinkl <lukas@kde.org>");
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument("url", QApplication::tr("URL to open"), "[url]");
+    parser.addOption(QCommandLineOption("latitude",
+                                        QApplication::tr("Latitude to start with, in decimal degrees"),
+                                        "latitude"));
+    parser.addOption(QCommandLineOption("longitude",
+                                        QApplication::tr("Longitude to start with, in decimal degrees"),
+                                        "longitude"));
     parser.process(app);
 
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("moviesPath",
-                                             QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first()));
-    engine.rootContext()->setContextProperty("musicPath",
-                                             QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first()));
-
-    QUrl url;
-    const QStringList args = parser.positionalArguments();
-    if (!args.isEmpty()) {
-        const QUrl tmp = args.first();
-        if (args.first().startsWith('/')) { // local absolute path
-            url = QUrl::fromLocalFile(args.first());
-        } else if (tmp.scheme().isEmpty()) { // local relative path
-            url = QUrl::fromLocalFile(QDir::currentPath() + '/' + args.first());
-        } else { // fully-qualified url
-            url = tmp;
-        }
-    }
-
-    engine.rootContext()->setContextProperty("playUrl", url);
+    engine.rootContext()->setContextProperty("initialLatitude", parser.isSet("latitude") ? parser.value("latitude").toDouble() : 49.6843842);
+    engine.rootContext()->setContextProperty("initialLongitude", parser.isSet("longitude") ? parser.value("longitude").toDouble() : 17.2190358);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
