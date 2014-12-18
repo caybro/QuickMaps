@@ -13,6 +13,10 @@ ApplicationWindow {
     width: 640
     height: 480
 
+    property bool mobile: ["android", "ios", "blackberry", "wince"].some(function(element) {
+        return element === Qt.platform.os;
+    });
+
     Settings {
         id: settings
         // save window size and position
@@ -44,10 +48,18 @@ ApplicationWindow {
         for (var i = 0; i < maps.length; i++){
             print(maps[i].name + " (" + maps[i].description + ")");
             print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
-            mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
+            if (mobile) {
+                if (maps[i].mobile) {
+                    mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
+                }
+            } else {
+                mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
+            }
         }
 
         //positionSource.update()
+        print("Platform: " + Qt.platform.os)
+        print("Mobile: " + mobile);
     }
 
     SystemPalette {
