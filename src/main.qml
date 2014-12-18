@@ -181,22 +181,21 @@ ApplicationWindow {
         anchors.fill: parent
         plugin: plugin
         center: QtPositioning.coordinate(49.6843842, 17.2190358)
-        zoomLevel: (maximumZoomLevel - minimumZoomLevel)/2
-        //        property bool lastZoomWasIn: true
-        //        onZoomLevelChanged: {
-        //            print("Current zoom level: " + zoomLevel)
-        //            if (lastZoomWasIn) {
-        //                print("Ceiling to: " + Math.ceil(zoomLevel))
-        //                map.zoomLevel = Math.ceil(zoomLevel);
-        //            } else {
-        //                print("Flooring to: " + Math.floor(zoomLevel));
-        //                map.zoomLevel = Math.floor(zoomLevel);
-        //            }
-        //        }
-        //        onWheelAngleChanged: {
-        //            //print("Wheel:" + angleDelta)
-        //            lastZoomWasIn = angleDelta.y > 0
-        //        }
+//        property bool lastZoomWasIn: true
+//        onZoomLevelChanged: {
+//            print("Current zoom level: " + zoomLevel)
+//            if (lastZoomWasIn) {
+//                print("Ceiling to: " + Math.ceil(zoomLevel))
+//                map.zoomLevel = Math.ceil(zoomLevel);
+//            } else {
+//                print("Flooring to: " + Math.floor(zoomLevel));
+//                map.zoomLevel = Math.floor(zoomLevel);
+//            }
+//        }
+//        onWheelAngleChanged: {
+//            //print("Wheel:" + angleDelta)
+//            lastZoomWasIn = angleDelta.y > 0
+//        }
 
         MapQuickItem {
             id: marker
