@@ -284,17 +284,17 @@ ApplicationWindow {
         }
 
         Keys.onPressed: {
-            if (event.key == Qt.Key_Right) {
+            if (event.key === Qt.Key_Right) {
                 pan(10, 0)
-            } else if (event.key == Qt.Key_Left) {
+            } else if (event.key === Qt.Key_Left) {
                 pan(-10, 0)
-            } else if (event.key == Qt.Key_Up) {
+            } else if (event.key === Qt.Key_Up) {
                 pan(0, 10)
-            } else if (event.key == Qt.Key_Down) {
+            } else if (event.key === Qt.Key_Down) {
                 pan(0, -10)
-            } else if (event.key == Qt.Key_Plus) {
+            } else if (event.key === Qt.Key_Plus) {
                 zoomLevel += 1
-            } else if (event.key == Qt.Key_Minus) {
+            } else if (event.key === Qt.Key_Minus) {
                 zoomLevel -= 1
             }
         }
