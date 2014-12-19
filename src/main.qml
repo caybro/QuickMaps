@@ -136,6 +136,16 @@ ApplicationWindow {
             section.property: "locationData.address.country"
             section.delegate: sectionHeading
 
+            function selectPlace(index) {
+                var currentPlace = model.get(currentIndex);
+                map.clearMapItems();
+                print("Selecting " + currentPlace.address.text);
+                messageLabel.text = currentPlace.address.text;
+                addMarker(currentPlace.coordinate);
+                map.fitViewportToGeoShape(currentPlace.boundingBox)
+                switchToMap()
+            }
+
             Keys.onPressed: {
                 if (event.key === Qt.Key_Up) {
                     decrementCurrentIndex()
@@ -148,13 +158,7 @@ ApplicationWindow {
                 } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                     print("Activated item at index: " + currentIndex)
                     if (currentIndex != -1) {
-                        var currentPlace = model.get(currentIndex);
-                        map.clearMapItems();
-                        print("Selecting " + currentPlace.address.text);
-                        messageLabel.text = currentPlace.address.text;
-                        addMarker(currentPlace.coordinate);
-                        map.fitViewportToGeoShape(currentPlace.boundingBox)
-                        switchToMap()
+                        selectPlace(currentIndex)
                     }
                 } else if (event.key === Qt.Key_Escape) {
                     switchToMap()
@@ -166,6 +170,9 @@ ApplicationWindow {
                 focus: true
                 onClicked: {
                     resultsView.currentIndex = resultsView.indexAt(mouse.x, mouse.y) // FIXME
+                }
+                onDoubleClicked: {
+                    resultsView.selectPlace(resultsView.currentIndex)
                 }
             }
 
