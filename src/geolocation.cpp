@@ -41,7 +41,7 @@ void GeoLocation::init()
         m_clientIface = new QDBusInterface(GEOCLUE_MASTER, path, GEOCLUE_CLIENT_IFACE, QDBusConnection::systemBus());
         m_clientIface->setProperty("DesktopId", "QuickMaps");
         m_clientIface->setProperty("DistanceThreshold", 500); // in meters
-        m_clientIface->setProperty("RequestedAccuracyLevel", 4); // city
+        m_clientIface->setProperty("RequestedAccuracyLevel", 8); // city
 
         if (!QDBusConnection::systemBus().connect(GEOCLUE_MASTER, path, GEOCLUE_CLIENT_IFACE,
                                                   QStringLiteral("LocationUpdated"), this,
@@ -60,6 +60,11 @@ void GeoLocation::init()
 double GeoLocation::accuracy() const
 {
     return m_acc;
+}
+
+bool GeoLocation::isValid() const
+{
+    return m_lat != -1 && m_lon != -1;
 }
 
 double GeoLocation::latitude() const
@@ -100,7 +105,7 @@ void GeoLocation::slotLocationUpdated(const QDBusObjectPath &oldPath, const QDBu
     if (desc.isValid())
         m_desc = desc.toString();
 
-    //qDebug() << lat << lon << locIface.property("Description");
+    qDebug() << "New location:" << lat << lon << acc << desc;
 
     if (lat.isValid() && lon.isValid()) {
         emit locationUpdated(m_lat, m_lon, m_acc, m_desc);

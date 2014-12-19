@@ -317,6 +317,7 @@ ApplicationWindow {
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconName: "go-home"
         shortcut: "Ctrl+Home"
+        enabled: GeoLocation.isValid
         onTriggered: {
             map.clearMapItems()
             addCircle(QtPositioning.coordinate(GeoLocation.latitude, GeoLocation.longitude), GeoLocation.accuracy)
