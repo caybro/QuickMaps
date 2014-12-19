@@ -58,6 +58,8 @@ ApplicationWindow {
                 mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
             }
         }
+
+        map.forceActiveFocus()
     }
 
     SystemPalette {
@@ -125,10 +127,12 @@ ApplicationWindow {
                     map.fitViewportToGeoShape(currentPlace.boundingBox)
                     visible = false;
                     map.visible = true;
+                    map.forceActiveFocus()
                 }
             } else if (event.key === Qt.Key_Escape) {
                 visible = false;
                 map.visible = true;
+                map.forceActiveFocus()
             }
         }
 
@@ -196,6 +200,7 @@ ApplicationWindow {
         id: map
         anchors.fill: parent
         plugin: plugin
+        focus: true
 //        property bool lastZoomWasIn: true
 //        onZoomLevelChanged: {
 //            print("Current zoom level: " + zoomLevel)
@@ -238,6 +243,22 @@ ApplicationWindow {
             map.center.latitude = settings.latitude
             map.center.longitude = settings.longitude
         }
+
+        Keys.onPressed: {
+            if (event.key == Qt.Key_Right) {
+                pan(10, 0)
+            } else if (event.key == Qt.Key_Left) {
+                pan(-10, 0)
+            } else if (event.key == Qt.Key_Up) {
+                pan(0, 10)
+            } else if (event.key == Qt.Key_Down) {
+                pan(0, -10)
+            } else if (event.key == Qt.Key_Plus) {
+                zoomLevel += 1
+            } else if (event.key == Qt.Key_Minus) {
+                zoomLevel -= 1
+            }
+        }
     }
 
     GeocodeModel {
@@ -258,6 +279,7 @@ ApplicationWindow {
                     messageLabel.text = currentPlace.address.text;
                     addMarker(currentPlace.coordinate);
                     map.fitViewportToGeoShape(currentPlace.boundingBox)
+                    map.forceActiveFocus()
                 } else if (count > 1) {
                     map.visible = false;
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
