@@ -1,8 +1,11 @@
 TEMPLATE = app
 
-QT += qml quick widgets
+CONFIG += c++11
 
-SOURCES += main.cpp
+QT += qml quick widgets dbus
+
+SOURCES += main.cpp \
+    geolocation.cpp
 
 lupdate_only{
 SOURCES += main.qml
@@ -17,3 +20,6 @@ QML_IMPORT_PATH =
 
 # Default rules for deployment.
 include(deployment.pri)
+
+HEADERS += \
+    geolocation.h

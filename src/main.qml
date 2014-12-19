@@ -32,6 +32,8 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        print("Platform: " + Qt.platform.os)
+        print("Mobile: " + mobile);
         print("Available services: " + plugin.availableServiceProviders)
         print("Actual plugin: " + plugin.name)
         print("Min/max zooms: " + map.minimumZoomLevel + "/" + map.maximumZoomLevel)
@@ -57,9 +59,7 @@ ApplicationWindow {
             }
         }
 
-        //positionSource.update()
-        print("Platform: " + Qt.platform.os)
-        print("Mobile: " + mobile);
+        //positionSource.active = true
     }
 
     SystemPalette {
@@ -123,7 +123,7 @@ ApplicationWindow {
                     map.clearMapItems();
                     print("Selecting " + currentPlace.address.text);
                     messageLabel.text = currentPlace.address.text;
-                    addMarker(currentPlace);
+                    addMarker(currentPlace.coordinate);
                     map.fitViewportToGeoShape(currentPlace.boundingBox)
                     resultsView.visible = false;
                     map.visible = true;
@@ -232,6 +232,12 @@ ApplicationWindow {
             }
         }
 
+        MapCircle {
+            id: homeCircle
+            color: "lightblue"
+            opacity: 0.4
+        }
+
         Component.onDestruction: {
             settings.latitude = map.center.latitude
             settings.longitude = map.center.longitude
@@ -259,7 +265,7 @@ ApplicationWindow {
                     map.clearMapItems();
                     print("Selecting " + currentPlace.address.text);
                     messageLabel.text = currentPlace.address.text;
-                    addMarker(currentPlace);
+                    addMarker(currentPlace.coordinate);
                     map.fitViewportToGeoShape(currentPlace.boundingBox)
                 } else if (count > 1) {
                     map.visible = false;
@@ -311,6 +317,12 @@ ApplicationWindow {
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconName: "go-home"
         shortcut: "Ctrl+Home"
+        onTriggered: {
+            map.clearMapItems()
+            addCircle(QtPositioning.coordinate(GeoLocation.latitude, GeoLocation.longitude), GeoLocation.accuracy)
+            map.fitViewportToMapItems()
+            messageLabel.text = ""
+        }
     }
 
     Action {
@@ -329,9 +341,7 @@ ApplicationWindow {
         //visible: mainWindow.visibility != Window.FullScreen
         RowLayout {
             anchors.fill: parent
-            ToolButton {
-                action: goHomeAction
-            }
+
             ToolButton {
                 action: goBackAction
             }
@@ -358,6 +368,9 @@ ApplicationWindow {
                 }
             }
             Item { Layout.preferredWidth: 10 }
+            ToolButton {
+                action: goHomeAction
+            }
             ToolButton {
                 action: fullscreenAction
                 visible: !mobile
@@ -392,9 +405,16 @@ ApplicationWindow {
         }
     }
 
-    function addMarker(loc) {
-        marker.coordinate = loc.coordinate
+    function addMarker(coord) {
+        marker.coordinate = coord
         map.addMapItem(marker);
-        print("Added marker for location: " + loc.address.text)
+        print("Added marker for location: " + coord.latitude + "," + coord.longitude)
+    }
+
+    function addCircle(coord, radius) {
+        homeCircle.center = coord;
+        homeCircle.radius = radius;
+        map.addMapItem(homeCircle);
+        print("Added circle for home location: " + coord.latitude + "," + coord.longitude + " and radius: " + radius)
     }
 }
