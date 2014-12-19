@@ -58,8 +58,6 @@ ApplicationWindow {
                 mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
             }
         }
-
-        //positionSource.active = true
     }
 
     SystemPalette {
@@ -125,9 +123,12 @@ ApplicationWindow {
                     messageLabel.text = currentPlace.address.text;
                     addMarker(currentPlace.coordinate);
                     map.fitViewportToGeoShape(currentPlace.boundingBox)
-                    resultsView.visible = false;
+                    visible = false;
                     map.visible = true;
                 }
+            } else if (event.key === Qt.Key_Escape) {
+                visible = false;
+                map.visible = true;
             }
         }
 
@@ -190,16 +191,6 @@ ApplicationWindow {
             currentIndex = 0;
         }
     }
-
-//    PositionSource {
-//        id: positionSource
-//        active: false
-
-//        onPositionChanged: {
-//            var coord = position.coordinate;
-//            console.log("Coordinate:", coord.latitude, coord.longitude);
-//        }
-//    }
 
     Map {
         id: map
