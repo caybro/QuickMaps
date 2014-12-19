@@ -12,6 +12,7 @@ ApplicationWindow {
     visible: true
     width: 640
     height: 480
+    title: "Quick Maps"
 
     property bool mobile: ["android", "ios", "blackberry", "wince"].some(function(element) {
         return element === Qt.platform.os;
@@ -136,14 +137,10 @@ ApplicationWindow {
                         messageLabel.text = currentPlace.address.text;
                         addMarker(currentPlace.coordinate);
                         map.fitViewportToGeoShape(currentPlace.boundingBox)
-                        visible = false;
-                        map.visible = true;
-                        map.forceActiveFocus()
+                        switchToMap()
                     }
                 } else if (event.key === Qt.Key_Escape) {
-                    visible = false;
-                    map.visible = true;
-                    map.forceActiveFocus()
+                    switchToMap()
                 }
             }
 
@@ -289,20 +286,16 @@ ApplicationWindow {
             if (status == GeocodeModel.Ready) {
                 print("Query returned " + count + " items")
                 if (count == 1) {
-                    map.visible = true
-                    resultsView.visible = false
                     var currentPlace = get(0);
                     map.clearMapItems();
                     print("Selecting " + currentPlace.address.text);
                     messageLabel.text = currentPlace.address.text;
                     addMarker(currentPlace.coordinate);
                     map.fitViewportToGeoShape(currentPlace.boundingBox)
-                    map.forceActiveFocus()
+                    switchToMap()
                 } else if (count > 1) {
-                    map.visible = false;
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
-                    resultsView.visible = true;
-                    resultsView.forceActiveFocus();
+                    switchToResults()
                 }
             } else if (status == GeocodeModel.Error) {
                 print("Query error: " + errorString + " (" + error + ")")
@@ -340,6 +333,13 @@ ApplicationWindow {
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconName: "go-previous"
         shortcut: StandardKey.Back
+        enabled: (map.visible && geocodeModel.count > 0) || !map.visible
+        onTriggered: {
+            if (map.visible)
+                switchToResults()
+            else
+                switchToMap()
+        }
     }
 
     Action {
@@ -448,5 +448,17 @@ ApplicationWindow {
         homeCircle.radius = radius;
         map.addMapItem(homeCircle);
         print("Added circle for home location: " + coord.latitude + "," + coord.longitude + " and radius: " + radius)
+    }
+
+    function switchToResults() {
+        map.visible = false
+        resultsView.visible = true
+        resultsView.forceActiveFocus()
+    }
+
+    function switchToMap() {
+        resultsView.visible = false
+        map.visible = true
+        map.forceActiveFocus()
     }
 }
