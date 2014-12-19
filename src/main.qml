@@ -201,21 +201,25 @@ ApplicationWindow {
         anchors.fill: parent
         plugin: plugin
         focus: true
-//        property bool lastZoomWasIn: true
-//        onZoomLevelChanged: {
-//            print("Current zoom level: " + zoomLevel)
-//            if (lastZoomWasIn) {
-//                print("Ceiling to: " + Math.ceil(zoomLevel))
-//                map.zoomLevel = Math.ceil(zoomLevel);
-//            } else {
-//                print("Flooring to: " + Math.floor(zoomLevel));
-//                map.zoomLevel = Math.floor(zoomLevel);
-//            }
-//        }
-//        onWheelAngleChanged: {
-//            //print("Wheel:" + angleDelta)
-//            lastZoomWasIn = angleDelta.y > 0
-//        }
+
+        MouseArea {
+            id: mapMouseArea
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onWheel: {
+                if (wheel.angleDelta.y > 0)
+                    map.zoomLevel += 1
+                else
+                    map.zoomLevel -= 1
+            }
+            onDoubleClicked: {
+                if (mouse.button == Qt.LeftButton) { // zoom in
+                    map.zoomLevel += 1
+                } else if (mouse.button == Qt.RightButton) { // zoom out
+                    map.zoomLevel -= 1
+                }
+            }
+        }
 
         MapQuickItem {
             id: marker
