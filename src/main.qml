@@ -212,12 +212,12 @@ ApplicationWindow {
                 Rectangle {
                     width: ListView.width
                     height: childrenRect.height
-                    color: "lightsteelblue"
 
                     Text {
                         text: section
                         font.bold: true
                         font.pixelSize: 15
+                        color: palette.highlight
                     }
                 }
             }
