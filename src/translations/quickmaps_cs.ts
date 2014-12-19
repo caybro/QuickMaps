@@ -4,70 +4,72 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../main.cpp" line="25"/>
+        <location filename="../main.cpp" line="26"/>
         <source>Simple maps application based on QML</source>
         <translation>Jednoduchá mapová aplikace založená na QML</translation>
     </message>
     <message>
-        <location filename="../main.cpp" line="28"/>
-        <source>URL to open</source>
-        <translation type="unfinished"></translation>
+        <location filename="../main.cpp" line="30"/>
+        <source>Latitude to start with, in decimal degrees</source>
+        <translation>Počáteční zěm. šířka, v desetinných stupních</translation>
+    </message>
+    <message>
+        <location filename="../main.cpp" line="33"/>
+        <source>Longitude to start with, in decimal degrees</source>
+        <translation>Počáteční zěm. délka, v desetinných stupních</translation>
     </message>
 </context>
 <context>
     <name>main</name>
     <message>
-        <location filename="../main.qml" line="123"/>
         <source>Location</source>
-        <translation>Umístění</translation>
+        <translation type="vanished">Umístění</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="127"/>
         <source>Coordinates</source>
-        <translation>Souřadnice</translation>
+        <translation type="vanished">Souřadnice</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="246"/>
+        <location filename="../main.qml" line="308"/>
         <source>&amp;Quit</source>
         <translation>U&amp;končit</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="247"/>
+        <location filename="../main.qml" line="309"/>
         <source>Exit Application</source>
         <translation>Ukončit aplikaci</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="255"/>
+        <location filename="../main.qml" line="317"/>
         <source>&amp;Go</source>
         <translation>Pře&amp;jít</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="270"/>
+        <location filename="../main.qml" line="332"/>
         <source>&amp;Back</source>
         <translation>&amp;Zpět</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="278"/>
         <source>&amp;Forward</source>
-        <translation>&amp;Vpřed</translation>
+        <translation type="vanished">&amp;Vpřed</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="286"/>
+        <location filename="../main.qml" line="347"/>
         <source>&amp;Home</source>
         <translation>&amp;Domů</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="294"/>
+        <location filename="../main.qml" line="362"/>
         <source>View &amp;Fullscreen</source>
         <translation>Zobrazit na &amp;celou obrazovku</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="318"/>
+        <location filename="../main.qml" line="382"/>
         <source>Query:</source>
         <translation>Dotaz:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../main.qml" line="353"/>
+        <location filename="../main.qml" line="297"/>
         <source>Query returned %n item(s)</source>
         <translation>
             <numerusform>Dotaz vrátil 1 položku</numerusform>
