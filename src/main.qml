@@ -153,7 +153,7 @@ ApplicationWindow {
                     incrementCurrentIndex()
                 } else if (event.key === Qt.Key_Home) {
                     currentIndex = 0
-                } else if (event.key == Qt.Key_End) {
+                } else if (event.key === Qt.Key_End) {
                     currentIndex = count - 1
                 } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
                     print("Activated item at index: " + currentIndex)
@@ -217,7 +217,6 @@ ApplicationWindow {
                         text: section
                         font.bold: true
                         font.pixelSize: 15
-                        color: palette.highlight
                     }
                 }
             }
@@ -269,7 +268,7 @@ ApplicationWindow {
 
         MapCircle {
             id: homeCircle
-            color: "lightblue"
+            color: palette.highlight
             opacity: 0.4
         }
 
@@ -289,9 +288,9 @@ ApplicationWindow {
             } else if (event.key === Qt.Key_Left) {
                 pan(-10, 0)
             } else if (event.key === Qt.Key_Up) {
-                pan(0, 10)
-            } else if (event.key === Qt.Key_Down) {
                 pan(0, -10)
+            } else if (event.key === Qt.Key_Down) {
+                pan(0, 10)
             } else if (event.key === Qt.Key_Plus) {
                 zoomLevel += 1
             } else if (event.key === Qt.Key_Minus) {
