@@ -102,97 +102,108 @@ ApplicationWindow {
         }
     }
 
-    ListView {
-        id: resultsView
-        model: geocodeModel
+    ScrollView {
+        id: resultsScrollView
         anchors.fill: parent
-        focus: true
-        delegate: placeDelegate
-        highlight: highlightDelegate
-        highlightFollowsCurrentItem: false
-        spacing: 5
-        header: headerDelegate
-        headerPositioning: ListView.PullBackHeader
-        clip: true
 
-        Keys.onPressed: {
-            if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
-                print("Activated item at index: " + currentIndex)
-                if (currentIndex != -1) {
-                    var currentPlace = model.get(currentIndex);
-                    map.clearMapItems();
-                    print("Selecting " + currentPlace.address.text);
-                    messageLabel.text = currentPlace.address.text;
-                    addMarker(currentPlace.coordinate);
-                    map.fitViewportToGeoShape(currentPlace.boundingBox)
+        ListView {
+            id: resultsView
+            focus: true
+            model: geocodeModel
+            delegate: placeDelegate
+            highlight: highlightDelegate
+            highlightFollowsCurrentItem: false
+            spacing: 5
+            clip: true
+            section.property: "locationData.address.country"
+            section.delegate: sectionHeading
+
+            Keys.onPressed: {
+                if (event.key === Qt.Key_Up) {
+                    decrementCurrentIndex()
+                } else if (event.key === Qt.Key_Down) {
+                    incrementCurrentIndex()
+                } else if (event.key === Qt.Key_Home) {
+                    currentIndex = 0
+                } else if (event.key == Qt.Key_End) {
+                    currentIndex = count - 1
+                } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
+                    print("Activated item at index: " + currentIndex)
+                    if (currentIndex != -1) {
+                        var currentPlace = model.get(currentIndex);
+                        map.clearMapItems();
+                        print("Selecting " + currentPlace.address.text);
+                        messageLabel.text = currentPlace.address.text;
+                        addMarker(currentPlace.coordinate);
+                        map.fitViewportToGeoShape(currentPlace.boundingBox)
+                        visible = false;
+                        map.visible = true;
+                        map.forceActiveFocus()
+                    }
+                } else if (event.key === Qt.Key_Escape) {
                     visible = false;
                     map.visible = true;
                     map.forceActiveFocus()
                 }
-            } else if (event.key === Qt.Key_Escape) {
-                visible = false;
-                map.visible = true;
-                map.forceActiveFocus()
             }
-        }
 
-        MouseArea {
-            anchors.fill: parent
-            focus: true
-            onClicked: {
-                resultsView.currentIndex = resultsView.indexAt(mouse.x, mouse.y)
-            }
-        }
-
-        Component {
-            id: headerDelegate
-            Column {
-                anchors.bottomMargin: 10
-                spacing: 5
-                Text {
-                    text: qsTr("Location")
-                    font.bold: true
-                }
-                Text {
-                    text: qsTr("Coordinates")
-                    font.bold: true
+            MouseArea {
+                anchors.fill: parent
+                focus: true
+                onClicked: {
+                    resultsView.currentIndex = resultsView.indexAt(mouse.x, mouse.y) // FIXME
                 }
             }
-        }
 
-        Component {
-            id: placeDelegate
-            Column {
-                spacing: 5
-                Text {
-                    id: locationDelegate
-                    text: locationData.address.text;
-                }
-                Text {
-                    text: locationData.coordinate.latitude + ", "
-                          + locationData.coordinate.longitude
-                    font.pointSize: locationDelegate.font.pointSize - 2
-                }
-            }
-        }
-
-        Component {
-            id: highlightDelegate
-            Rectangle {
-                width: resultsView.currentItem.width; height: resultsView.currentItem.height
-                color: palette.highlight; radius: 5
-                y: resultsView.currentItem.y
-                Behavior on y {
-                    SpringAnimation {
-                        spring: 4
-                        damping: 0.2
+            Component {
+                id: placeDelegate
+                Column {
+                    spacing: 5
+                    Text {
+                        id: locationDelegate
+                        text: locationData.address.text;
+                    }
+                    Text {
+                        text: locationData.coordinate.latitude + ", "
+                              + locationData.coordinate.longitude
+                        font.pointSize: locationDelegate.font.pointSize - 2
                     }
                 }
             }
-        }
 
-        Component.onCompleted: {
-            currentIndex = 0;
+            Component {
+                id: highlightDelegate
+                Rectangle {
+                    width: resultsView.currentItem.width; height: resultsView.currentItem.height
+                    color: palette.highlight; radius: 5
+                    y: resultsView.currentItem.y
+                    Behavior on y {
+                        SpringAnimation {
+                            spring: 4
+                            damping: 0.2
+                        }
+                    }
+                }
+            }
+
+            Component {
+                id: sectionHeading
+                Rectangle {
+                    width: ListView.width
+                    height: childrenRect.height
+                    color: "lightsteelblue"
+
+                    Text {
+                        text: section
+                        font.bold: true
+                        font.pixelSize: 15
+                    }
+                }
+            }
+
+            Component.onCompleted: {
+                currentIndex = 0;
+            }
         }
     }
 
@@ -207,6 +218,9 @@ ApplicationWindow {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onWheel: {
+                print("Current mouse pos: " + wheel.x + ";" + wheel.y)
+                print("Translated to map coords: " + map.toCoordinate(Qt.point(wheel.x, wheel.y)))
+                //map.center = map.toCoordinate(Qt.point(wheel.x, wheel.y)) // TODO need to change the viewport, not center
                 if (wheel.angleDelta.y > 0)
                     map.zoomLevel += 1
                 else
@@ -269,7 +283,7 @@ ApplicationWindow {
         id: geocodeModel
         plugin: geocodePlugin
         autoUpdate: false
-        limit: 20
+        limit: 50
 
         onStatusChanged: {
             if (status == GeocodeModel.Ready) {
@@ -408,7 +422,7 @@ ApplicationWindow {
             Label {
                 id: posLabel
                 visible: map.visible
-                text: map.center.latitude.toFixed(4) + ", " + map.center.longitude.toFixed(4) + " (@" + map.zoomLevel.toFixed() + ")"
+                text: map.center.latitude.toFixed(4) + ", " + map.center.longitude.toFixed(4) + " (@" + map.zoomLevel + ")"
                 Layout.alignment: Qt.AlignRight
             }
         }
