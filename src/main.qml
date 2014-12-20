@@ -341,7 +341,7 @@ ApplicationWindow {
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconName: "go-jump-locationbar"
         shortcut: "Ctrl+G"
-        enabled: input.text != ""
+        enabled: input.text != "" && geocodeModel.status != GeocodeModel.Loading
         onTriggered: {
             geocodeModel.reset();
             print("Current query: " + input.text);
@@ -356,7 +356,7 @@ ApplicationWindow {
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconName: "go-previous"
         shortcut: StandardKey.Back
-        enabled: (map.visible && geocodeModel.count > 0) || !map.visible
+        enabled: (map.visible && geocodeModel.count > 1) || !map.visible
         onTriggered: {
             if (map.visible)
                 switchToResults()

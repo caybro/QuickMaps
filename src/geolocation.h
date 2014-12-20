@@ -31,6 +31,7 @@ class GeoLocation : public QObject
     Q_PROPERTY(double longitude READ longitude NOTIFY locationUpdated)
     Q_PROPERTY(double accuracy READ accuracy NOTIFY locationUpdated)
     Q_PROPERTY(bool isValid READ isValid NOTIFY locationUpdated)
+
 public:
     explicit GeoLocation(QObject *parent = 0);
     ~GeoLocation();
