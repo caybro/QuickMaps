@@ -488,7 +488,10 @@ ApplicationWindow {
                 map.fitViewportToGeoShape(QtPositioning.circle(homeCircle.center, homeCircle.radius))
             } else {
                 messageLabel.text = markerPlace.messageText
-                map.fitViewportToGeoShape(QtPositioning.circle(markerPlace.coordinate, 1000))
+                if (directionsMode)
+                    map.fitViewportToGeoShape(QtPositioning.circle(markerStart.coordinate, 100))
+                else
+                    map.fitViewportToGeoShape(QtPositioning.circle(markerPlace.coordinate, 1000))
             }
         }
     }
