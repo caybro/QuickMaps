@@ -111,7 +111,7 @@ ApplicationWindow {
     ComboBox {
         id: mapTypeCombo
         anchors.top: parent.top
-        anchors.right: parent.right
+        anchors.left: parent.left
         anchors.margins: 5
         model: mapTypeModel
         textRole: "name"
@@ -265,9 +265,9 @@ ApplicationWindow {
                 //print("Translated to map coords: " + map.toCoordinate(Qt.point(wheel.x, wheel.y)))
                 //map.center = map.toCoordinate(Qt.point(wheel.x, wheel.y)) // TODO need to change the viewport, not center
                 if (wheel.angleDelta.y > 0)
-                    map.zoomLevel += 1
+                    zoomIn()
                 else
-                    map.zoomLevel -= 1
+                    zoomOut()
             }
             onPressAndHold: {
                 if (mouse.button == Qt.RightButton) {
@@ -277,9 +277,9 @@ ApplicationWindow {
             }
             onDoubleClicked: {
                 if (mouse.button == Qt.LeftButton) { // zoom in
-                    map.zoomLevel += 1
+                    zoomIn()
                 } else if (mouse.button == Qt.RightButton) { // zoom out
-                    map.zoomLevel -= 1
+                    zoomOut()
                 }
             }
 
@@ -385,9 +385,9 @@ ApplicationWindow {
             } else if (event.key === Qt.Key_Down) {
                 pan(0, 10)
             } else if (event.key === Qt.Key_Plus) {
-                zoomLevel += 1
+                zoomIn()
             } else if (event.key === Qt.Key_Minus) {
-                zoomLevel -= 1
+                zoomOut()
             }
         }
     }
@@ -674,5 +674,13 @@ ApplicationWindow {
 
     function printCoords(coord) {
         return coord.latitude + "," + coord.longitude
+    }
+
+    function zoomIn() {
+        map.zoomLevel += 1
+    }
+
+    function zoomOut() {
+        map.zoomLevel -= 1
     }
 }
