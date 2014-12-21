@@ -250,6 +250,32 @@ ApplicationWindow {
         }
     }
 
+    ToolButton {
+        id: zoomOutButton
+        z: map.z + 1
+        iconSource: "qrc:/icons/ic_remove_24px.svg"
+        enabled: map.zoomLevel > map.minimumZoomLevel
+        anchors {
+            right: parent.right
+            top: zoomInButton.bottom
+            margins: 5
+        }
+        onClicked: zoomOut()
+    }
+
+    ToolButton {
+        id: zoomInButton
+        z: map.z + 1
+        iconSource: "qrc:/icons/ic_add_24px.svg"
+        enabled: map.zoomLevel < map.maximumZoomLevel
+        anchors {
+            right: parent.right
+            top: parent.top
+            margins: 5
+        }
+        onClicked: zoomIn()
+    }
+
     Map {
         id: map
         anchors.fill: parent
