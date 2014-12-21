@@ -143,7 +143,7 @@ ApplicationWindow {
 
             function selectPlace(index) {
                 var currentPlace = model.get(currentIndex);
-                if (currentSearchField == "") {
+                if (currentSearchField == "" || !directionsMode) {
                     map.removeMapItem(markerPlace);
                     addMarker(currentPlace.coordinate)
                 }
@@ -405,7 +405,7 @@ ApplicationWindow {
                     var currentPlace = get(0);
                     print("Selecting " + currentPlace.address.text + " as " + currentSearchField);
                     messageLabel.text = currentPlace.address.text;
-                    if (currentSearchField == "") {
+                    if (currentSearchField == "" || !directionsMode) {
                         map.removeMapItem(markerPlace);
                         addMarker(currentPlace.coordinate);
                     }
@@ -532,10 +532,8 @@ ApplicationWindow {
                 placeholderText: qsTr("Search for places, addresses and locations")
                 onAccepted: {
                     if (text != "") {
-                        if (directionsMode) {
-                            start = QtPositioning.coordinate()
-                            currentSearchField = "start"
-                        }
+                        start = QtPositioning.coordinate()
+                        currentSearchField = "start"
                         goAction.trigger()
                     }
                 }
