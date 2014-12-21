@@ -424,7 +424,7 @@ ApplicationWindow {
                     switchToResults()
                 } else { // 0 items
                     print ("Got no results from " + currentSearchField)
-                    map.removeMapItem(marker);
+                    map.removeMapItem(markerPlace);
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
                 }
             } else if (status == GeocodeModel.Error) {
@@ -451,7 +451,7 @@ ApplicationWindow {
         enabled: false
         onTriggered: {
             geocodeModel.reset()
-            var text = currentSearchField == "start" ? input.text : inputDestination.text
+            var text = currentSearchField == "destination" ? inputDestination.text : input.text
             print("Current query: " + text + " (searching for " + currentSearchField + ")");
             geocodeModel.query = text;
             geocodeModel.update();
@@ -532,8 +532,10 @@ ApplicationWindow {
                 placeholderText: qsTr("Search for places, addresses and locations")
                 onAccepted: {
                     if (text != "") {
-                        start = QtPositioning.coordinate()
-                        currentSearchField = "start"
+                        if (directionsMode) {
+                            start = QtPositioning.coordinate()
+                            currentSearchField = "start"
+                        }
                         goAction.trigger()
                     }
                 }
@@ -577,8 +579,10 @@ ApplicationWindow {
                 visible: goNavigateAction.checked
                 onAccepted: {
                     if (text != "") {
-                        destination = QtPositioning.coordinate()
-                        currentSearchField = "destination"
+                        if (directionsMode) {
+                            destination = QtPositioning.coordinate()
+                            currentSearchField = "destination"
+                        }
                         goAction.trigger()
                     }
                 }
