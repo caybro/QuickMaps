@@ -3,6 +3,24 @@
         <file>main.qml</file>
         <file>translations/quickmaps_cs.qm</file>
         <file>osm.png</file>
-        <file>marker.png</file>
+        <file>icons/ic_arrow_back_24px.svg</file>
+        <file>icons/ic_directions_24px.svg</file>
+        <file>icons/ic_map_24px.svg</file>
+        <file>icons/ic_my_location_24px.svg</file>
+        <file>icons/ic_navigation_24px.svg</file>
+        <file>icons/ic_satellite_24px.svg</file>
+        <file>icons/ic_terrain_24px.svg</file>
+        <file>icons/ic_traffic_24px.svg</file>
+        <file>icons/ic_fullscreen_24px.svg</file>
+        <file>icons/ic_fullscreen_exit_24px.svg</file>
+        <file>icons/ic_search_24px.svg</file>
+        <file>icons/ic_place_24px.svg</file>
+        <file>DirectionsDialogForm.ui.qml</file>
+        <file>icons/ic_swap_horiz_24px.svg</file>
+        <file>icons/ic_done_24px.svg</file>
+        <file>icons/ic_warning_24px.svg</file>
+        <file>icons/ic_add_24px.svg</file>
+        <file>icons/ic_pin_drop_24px.svg</file>
+        <file>icons/ic_location_searching_24px.svg</file>
     </qresource>
 </RCC>

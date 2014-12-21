@@ -79,6 +79,11 @@ double GeoLocation::accuracy() const
     return m_acc;
 }
 
+QString GeoLocation::description() const
+{
+    return m_desc;
+}
+
 bool GeoLocation::isValid() const
 {
     return m_lat != -1 && m_lon != -1;
@@ -98,7 +103,7 @@ void GeoLocation::slotLocationUpdated(const QDBusObjectPath &oldPath, const QDBu
 {
     Q_UNUSED(oldPath)
     const QString path = newPath.path();
-    qDebug() << "Got new location" << newPath.path();
+    //qDebug() << "Got new location" << newPath.path();
 
     QDBusInterface locIface(GEOCLUE_MASTER, path, GEOCLUE_LOCATION_IFACE, QDBusConnection::systemBus());
     if (!locIface.isValid()) {
@@ -122,7 +127,7 @@ void GeoLocation::slotLocationUpdated(const QDBusObjectPath &oldPath, const QDBu
     if (desc.isValid())
         m_desc = desc.toString();
 
-    qDebug() << "New location:" << lat << lon << acc << desc;
+    qDebug() << "Got new location:" << lat << lon << acc << desc;
 
     if (lat.isValid() && lon.isValid()) {
         emit locationUpdated(m_lat, m_lon, m_acc, m_desc);

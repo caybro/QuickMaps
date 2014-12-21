@@ -31,6 +31,7 @@ class GeoLocation : public QObject
     Q_PROPERTY(double longitude READ longitude NOTIFY locationUpdated)
     Q_PROPERTY(double accuracy READ accuracy NOTIFY locationUpdated)
     Q_PROPERTY(bool isValid READ isValid NOTIFY locationUpdated)
+    Q_PROPERTY(QString description READ description NOTIFY locationUpdated)
 
 public:
     explicit GeoLocation(QObject *parent = 0);
@@ -39,6 +40,7 @@ public:
     double latitude() const;
     double longitude() const;
     double accuracy() const;
+    QString description() const;
 
     bool isValid() const;
 
