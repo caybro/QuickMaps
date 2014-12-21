@@ -55,6 +55,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        print("App name/version: " + Qt.application.name + " " + Qt.application.version)
         print("Platform: " + Qt.platform.os)
         print("Mobile: " + mobile);
         print("Available services: " + plugin.availableServiceProviders)
@@ -501,12 +502,6 @@ ApplicationWindow {
         text: qsTr("Directions")
         iconSource: "qrc:/icons/ic_directions_24px.svg"
         checkable: true
-        onCheckedChanged: {
-            if (checked)
-                input.placeholderText = qsTr("Start")
-            else
-                input.placeholderText = qsTr("Search for places, addresses and locations")
-        }
     }
 
     Action {
@@ -532,7 +527,7 @@ ApplicationWindow {
             TextField {
                 id: input
                 Layout.fillWidth: true
-                placeholderText: qsTr("Search for places, addresses and locations")
+                placeholderText: directionsMode ? qsTr("Start") : qsTr("Search for places, addresses and locations")
                 onAccepted: {
                     if (text != "") {
                         start = QtPositioning.coordinate()
@@ -560,7 +555,7 @@ ApplicationWindow {
             ToolButton {
                 id: switchButton
                 iconSource: "qrc:/icons/ic_swap_horiz_24px.svg"
-                visible: inputDestination.visible
+                visible: directionsMode
                 text: qsTr("Swap")
                 tooltip: qsTr("Swap Start and Destination")
                 enabled: start.isValid || destination.isValid
@@ -577,7 +572,7 @@ ApplicationWindow {
                 id: inputDestination
                 Layout.fillWidth: true
                 placeholderText: qsTr("Destination")
-                visible: goNavigateAction.checked
+                visible: directionsMode
                 onAccepted: {
                     if (text != "") {
                         if (directionsMode) {
@@ -607,7 +602,7 @@ ApplicationWindow {
             ToolButton {
                 id: goButton
                 action: goAction
-                visible: !goNavigateAction.checked
+                visible: !directionsMode
 
                 BusyIndicator {
                     running: geocodeModel.status == GeocodeModel.Loading
