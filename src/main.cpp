@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("KDE");
     app.setOrganizationDomain("kde.org");
     app.setApplicationName("QuickMaps");
-    app.setApplicationVersion("0.1");
+    app.setApplicationVersion(VERSION_NUMBER);
 
     QTranslator appTrans;
     appTrans.load(QStringLiteral(":/translations/quickmaps_") + QLocale::system().name());
