@@ -24,5 +24,6 @@
         <file>icons/ic_remove_24px.svg</file>
         <file>ResultsView.qml</file>
         <file>QuickMap.qml</file>
+        <file>QuickGeocodeModel.qml</file>
     </qresource>
 </RCC>
