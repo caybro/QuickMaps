@@ -65,6 +65,7 @@ ApplicationWindow {
         print("Supports offline maps: " + plugin.supportsMapping(Plugin.OfflineMappingFeature))
         print("Supports localized maps: " + plugin.supportsMapping(Plugin.LocalizedMappingFeature))
         print("Supports online routing: " + plugin.supportsRouting(Plugin.OnlineRoutingFeature))
+        print("Supports offline routing: " + plugin.supportsRouting(Plugin.OfflineRoutingFeature))
         print("Supports localized routing: " + plugin.supportsRouting(Plugin.LocalizedRoutingFeature))
         print("Supports dynamic routing, based on current position: " + plugin.supportsRouting(Plugin.RouteUpdatesFeature))
         print("Supports routing alternatives: " + plugin.supportsRouting(Plugin.AlternativeRoutesFeature))
@@ -250,7 +251,7 @@ ApplicationWindow {
         }
     }
 
-    ToolButton {
+    Button {
         id: zoomOutButton
         z: map.z + 1
         iconSource: "qrc:/icons/ic_remove_24px.svg"
@@ -262,9 +263,10 @@ ApplicationWindow {
             margins: 5
         }
         onClicked: zoomOut()
+        opacity: hovered ? 0.9 : 0.4
     }
 
-    ToolButton {
+    Button {
         id: zoomInButton
         z: map.z + 1
         iconSource: "qrc:/icons/ic_add_24px.svg"
@@ -276,6 +278,7 @@ ApplicationWindow {
             margins: 5
         }
         onClicked: zoomIn()
+        opacity: hovered ? 0.9 : 0.4
     }
 
     Map {
@@ -579,6 +582,12 @@ ApplicationWindow {
                     visible: input.text != "" && geocodeModel.count == 0
                              && currentSearchField == "start" && geocodeModel.status == GeocodeModel.Ready
                 }
+                BusyIndicator {
+                    running: geocodeModel.status == GeocodeModel.Loading && currentSearchField == "start"
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: parent.childrenRect.height - 5
+                }
             }
             ToolButton {
                 id: switchButton
@@ -626,16 +635,17 @@ ApplicationWindow {
                     visible: input.text != "" && geocodeModel.count == 0 &&
                              currentSearchField == "destination" && geocodeModel.status == GeocodeModel.Ready
                 }
+                BusyIndicator {
+                    running: geocodeModel.status == GeocodeModel.Loading && currentSearchField == "destination"
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    height: parent.childrenRect.height - 5
+                }
             }
             ToolButton {
                 id: goButton
                 action: goAction
                 visible: !directionsMode
-
-                BusyIndicator {
-                    running: geocodeModel.status == GeocodeModel.Loading
-                    anchors.fill: parent
-                }
             }
             ToolButton {
                 id: directionsButton
