@@ -24,6 +24,8 @@ import QtLocation 5.3
 import QtPositioning 5.2
 import Qt.labs.settings 1.0
 
+import "qrc:/"
+
 ApplicationWindow {
     id: mainWindow
     visible: true
@@ -127,118 +129,8 @@ ApplicationWindow {
         }
     }
 
-    ScrollView {
-        id: resultsScrollView
-        anchors.fill: parent
-
-        ListView {
-            id: resultsView
-            focus: true
-            model: geocodeModel
-            delegate: placeDelegate
-            highlight: highlightDelegate
-            highlightFollowsCurrentItem: false
-            spacing: 5
-            clip: true
-            section.property: "locationData.address.country"
-            section.delegate: sectionHeading
-
-            function selectPlace(index) {
-                var currentPlace = model.get(currentIndex);
-                if (currentSearchField == "" || !directionsMode) {
-                    map.removeMapItem(markerPlace);
-                    addMarker(currentPlace.coordinate)
-                }
-                print("Selecting " + currentPlace.address.text + " as " + currentSearchField);
-                messageLabel.text = currentPlace.address.text;
-                if (currentSearchField == "start") {
-                    start = makeCoords(currentPlace)
-                } else if (currentSearchField == "destination") {
-                    destination = makeCoords(currentPlace)
-                }
-                map.fitViewportToGeoShape(currentPlace.boundingBox)
-                switchToMap()
-            }
-
-            Keys.onPressed: {
-                if (event.key === Qt.Key_Up) {
-                    decrementCurrentIndex()
-                } else if (event.key === Qt.Key_Down) {
-                    incrementCurrentIndex()
-                } else if (event.key === Qt.Key_Home) {
-                    currentIndex = 0
-                } else if (event.key === Qt.Key_End) {
-                    currentIndex = count - 1
-                } else if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return) {
-                    print("Activated item at index: " + currentIndex)
-                    if (currentIndex != -1) {
-                        selectPlace(currentIndex)
-                    }
-                } else if (event.key === Qt.Key_Escape) {
-                    switchToMap()
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                focus: true
-                onClicked: {
-                    resultsView.currentIndex = resultsView.indexAt(mouse.x, mouse.y) // FIXME
-                }
-                onDoubleClicked: {
-                    resultsView.selectPlace(resultsView.currentIndex)
-                }
-            }
-
-            Component {
-                id: placeDelegate
-                Column {
-                    spacing: 5
-                    Text {
-                        id: locationDelegate
-                        text: locationData.address.text;
-                    }
-                    Text {
-                        text: locationData.coordinate.latitude + ", "
-                              + locationData.coordinate.longitude
-                        font.pointSize: locationDelegate.font.pointSize - 2
-                    }
-                }
-            }
-
-            Component {
-                id: highlightDelegate
-                Rectangle {
-                    width: resultsView.currentItem.width; height: resultsView.currentItem.height
-                    color: palette.highlight; radius: 5
-                    y: resultsView.currentItem.y
-                    Behavior on y {
-                        SpringAnimation {
-                            spring: 4
-                            damping: 0.2
-                        }
-                    }
-                }
-            }
-
-            Component {
-                id: sectionHeading
-                Rectangle {
-                    width: ListView.width
-                    height: childrenRect.height
-
-                    Text {
-                        text: section
-                        font.bold: true
-                        font.pixelSize: 15
-                    }
-                }
-            }
-
-            Component.onCompleted: {
-                currentIndex = 0;
-            }
-        }
+    ResultsView {
+        id: resultsView
     }
 
     ToolButton {
@@ -262,7 +154,7 @@ ApplicationWindow {
             top: zoomInButton.bottom
             margins: 5
         }
-        onClicked: zoomOut()
+        onClicked: map.zoomOut()
         opacity: hovered ? 0.9 : 0.4
     }
 
@@ -277,150 +169,13 @@ ApplicationWindow {
             top: parent.top
             margins: 5
         }
-        onClicked: zoomIn()
+        onClicked: map.zoomIn()
         opacity: hovered ? 0.9 : 0.4
     }
 
-    Map {
+    QuickMap {
         id: map
-        anchors.fill: parent
         plugin: plugin
-        focus: true
-
-        MouseArea {
-            id: mapMouseArea
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onWheel: {
-                //print("Current mouse pos: " + wheel.x + ";" + wheel.y)
-                //print("Translated to map coords: " + map.toCoordinate(Qt.point(wheel.x, wheel.y)))
-                //map.center = map.toCoordinate(Qt.point(wheel.x, wheel.y)) // TODO need to change the viewport, not center
-                if (wheel.angleDelta.y > 0)
-                    zoomIn()
-                else
-                    zoomOut()
-            }
-            onPressAndHold: {
-                if (mouse.button == Qt.RightButton) {
-                    //print("Right clicked at: " + map.toCoordinate(Qt.point(mouse.x, mouse.y)))
-                    contextMenu.popup()
-                }
-            }
-            onDoubleClicked: {
-                if (mouse.button == Qt.LeftButton) { // zoom in
-                    zoomIn()
-                } else if (mouse.button == Qt.RightButton) { // zoom out
-                    zoomOut()
-                }
-            }
-
-            Menu {
-                id: contextMenu
-                MenuItem {
-                    text: qsTr("What's here?")
-                    onTriggered: {
-                        //print("Coord: " + map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY)))
-                        currentSearchField = ""
-                        geocodeModel.query = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
-                        geocodeModel.update();
-                    }
-                }
-                MenuItem {
-                    text: qsTr("Directions from this place")
-                    onTriggered: {
-                        goNavigateAction.checked = true
-                        var here = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
-                        start = here
-                        currentSearchField = "start"
-                        input.text = printCoords(here)
-                    }
-                }
-                MenuItem {
-                    text: qsTr("Directions to this place")
-                    onTriggered: {
-                        goNavigateAction.checked = true
-                        var here = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
-                        destination = here
-                        currentSearchField = "destination"
-                        inputDestination.text = printCoords(here)
-                    }
-                }
-            }
-        }
-
-        MapQuickItem {
-            id: markerPlace
-            anchorPoint.x: image.width/4
-            anchorPoint.y: image.height
-
-            property string messageText
-
-            sourceItem: Image {
-                id: image
-                source: "qrc:/icons/ic_pin_drop_24px.svg"
-            }
-        }
-
-        MapQuickItem {
-            id: markerStart
-            anchorPoint.x: imageStart.width/4
-            anchorPoint.y: imageStart.height
-            coordinate: start
-            visible: start.isValid
-
-            sourceItem: Image {
-                id: imageStart
-                source: "qrc:/icons/ic_place_24px.svg"
-            }
-        }
-
-        MapQuickItem {
-            id: markerDestination
-            anchorPoint.x: imageDest.width/4
-            anchorPoint.y: imageDest.height
-            coordinate: destination
-            visible: destination.isValid
-
-            sourceItem: Image {
-                id: imageDest
-                source: "qrc:/icons/ic_place_24px.svg"
-            }
-        }
-
-        MapCircle {
-            id: homeCircle
-            color: palette.highlight
-            opacity: 0.4
-            center: QtPositioning.coordinate(GeoLocation.latitude, GeoLocation.longitude)
-            radius: GeoLocation.accuracy
-            visible: goHomeAction.checked
-        }
-
-        Component.onDestruction: {
-            settings.latitude = map.center.latitude
-            settings.longitude = map.center.longitude
-        }
-
-        Component.onCompleted: {
-            map.center.latitude = settings.latitude
-            map.center.longitude = settings.longitude
-        }
-
-        Keys.onPressed: {
-            if (event.key === Qt.Key_Right) {
-                pan(10, 0)
-            } else if (event.key === Qt.Key_Left) {
-                pan(-10, 0)
-            } else if (event.key === Qt.Key_Up) {
-                pan(0, -10)
-            } else if (event.key === Qt.Key_Down) {
-                pan(0, 10)
-            } else if (event.key === Qt.Key_Plus) {
-                zoomIn()
-            } else if (event.key === Qt.Key_Minus) {
-                zoomOut()
-            }
-        }
     }
 
     GeocodeModel {
@@ -438,7 +193,7 @@ ApplicationWindow {
                     print("Selecting " + currentPlace.address.text + " as " + currentSearchField);
                     messageLabel.text = currentPlace.address.text;
                     if (currentSearchField == "" || !directionsMode) {
-                        map.removeMapItem(markerPlace);
+                        map.removeMapItem(map.markerPlace);
                         addMarker(currentPlace.coordinate);
                     }
                     if (currentPlace.boundingBox.isValid)
@@ -456,7 +211,7 @@ ApplicationWindow {
                     switchToResults()
                 } else { // 0 items
                     print ("Got no results from " + currentSearchField)
-                    map.removeMapItem(markerPlace);
+                    map.removeMapItem(map.markerPlace);
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
                 }
             } else if (status == GeocodeModel.Error) {
@@ -515,15 +270,15 @@ ApplicationWindow {
         checkable: true
         onTriggered: {
             if (checked) {
-                markerPlace.messageText = messageLabel.text
+                map.markerPlace.messageText = messageLabel.text
                 messageLabel.text = GeoLocation.description
-                map.fitViewportToGeoShape(QtPositioning.circle(homeCircle.center, homeCircle.radius))
+                map.fitViewportToGeoShape(QtPositioning.circle(map.homeCircle.center, map.homeCircle.radius))
             } else {
-                messageLabel.text = markerPlace.messageText
+                messageLabel.text = map.markerPlace.messageText
                 if (directionsMode)
-                    map.fitViewportToGeoShape(QtPositioning.circle(markerStart.coordinate, 100))
+                    map.fitViewportToGeoShape(QtPositioning.circle(map.markerStart.coordinate, 100))
                 else
-                    map.fitViewportToGeoShape(QtPositioning.circle(markerPlace.coordinate, 1000))
+                    map.fitViewportToGeoShape(QtPositioning.circle(map.markerPlace.coordinate, 1000))
             }
         }
     }
@@ -689,8 +444,8 @@ ApplicationWindow {
     }
 
     function addMarker(coord) {
-        markerPlace.coordinate = coord
-        map.addMapItem(markerPlace);
+        map.markerPlace.coordinate = coord
+        map.addMapItem(map.markerPlace);
         print("Added marker for place: " + printCoords(coord))
     }
 
@@ -712,13 +467,5 @@ ApplicationWindow {
 
     function printCoords(coord) {
         return coord.latitude + "," + coord.longitude
-    }
-
-    function zoomIn() {
-        map.zoomLevel += 1
-    }
-
-    function zoomOut() {
-        map.zoomLevel -= 1
     }
 }

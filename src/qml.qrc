@@ -22,5 +22,7 @@
         <file>icons/ic_pin_drop_24px.svg</file>
         <file>icons/ic_location_searching_24px.svg</file>
         <file>icons/ic_remove_24px.svg</file>
+        <file>ResultsView.qml</file>
+        <file>QuickMap.qml</file>
     </qresource>
 </RCC>

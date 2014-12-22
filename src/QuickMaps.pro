@@ -8,7 +8,7 @@ SOURCES += main.cpp \
     geolocation.cpp
 
 lupdate_only{
-SOURCES += main.qml
+SOURCES += main.qml ResultsView.qml QuickMap.qml
 }
 
 RESOURCES += qml.qrc
@@ -26,3 +26,7 @@ HEADERS += \
 
 VERSION = 0.1
 DEFINES     += VERSION_NUMBER=\\\"$${VERSION}\\\"
+
+DISTFILES += \
+    ResultsView.qml \
+    QuickMap.qml
