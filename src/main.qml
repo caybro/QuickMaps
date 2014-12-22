@@ -255,6 +255,7 @@ ApplicationWindow {
         z: map.z + 1
         iconSource: "qrc:/icons/ic_remove_24px.svg"
         enabled: map.zoomLevel > map.minimumZoomLevel
+        tooltip: qsTr("Zoom Out")
         anchors {
             right: parent.right
             top: zoomInButton.bottom
@@ -268,6 +269,7 @@ ApplicationWindow {
         z: map.z + 1
         iconSource: "qrc:/icons/ic_add_24px.svg"
         enabled: map.zoomLevel < map.maximumZoomLevel
+        tooltip: qsTr("Zoom In")
         anchors {
             right: parent.right
             top: parent.top
