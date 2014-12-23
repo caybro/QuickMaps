@@ -17,11 +17,17 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.1
 
 ScrollView {
     id: resultsScrollView
-    anchors.fill: parent
-    
+    width: 0
+    Layout.maximumWidth: map*.4
+
+    Behavior on width {
+        NumberAnimation { duration: 300 }
+    }
+
     ListView {
         id: resultsView
         focus: true

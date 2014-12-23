@@ -17,19 +17,20 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.2
+import QtQuick.Layouts 1.1
 import QtLocation 5.3
 import QtPositioning 5.2
 
 Map {
     id: map
-    anchors.fill: parent
+    Layout.fillWidth: true
     focus: true
 
     property alias markerPlace: markerPlace
     property alias markerStart: markerStart
     property alias markerDestination: markerDestination
     property alias homeCircle: homeCircle
-    
+
     MouseArea {
         id: mapMouseArea
         anchors.fill: parent

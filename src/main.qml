@@ -106,23 +106,44 @@ ApplicationWindow {
         PluginParameter { name: "useragent"; value: "QuickMaps" }
     }
 
-    ResultsView {
-        id: resultsView
-    }
+    SplitView {
+        id: splitView
+        anchors.fill: parent
 
-    QuickMap {
-        id: map
-        plugin: plugin
+        ResultsView {
+            id: resultsView
+        }
 
-        MapItemView {
-            id: mapItemView
-            model: routing
-            delegate: MapRoute {
-                route: routeData
-                line.color: "maroon"
-                line.width: 5
-                smooth: true
-                opacity: 0.7
+        QuickMap {
+            id: map
+            plugin: plugin
+
+            ComboBox {
+                id: mapTypeCombo
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 5
+                model: mapTypeModel
+                textRole: "name"
+                z: parent.z + 1
+                visible: parent.visible
+                implicitWidth: 200
+                onActivated: {
+                    map.activeMapType = model.get(index).data
+                    map.update()
+                }
+            }
+
+            MapItemView {
+                id: mapItemView
+                model: routing
+                delegate: MapRoute {
+                    route: routeData
+                    line.color: "maroon"
+                    line.width: 5
+                    smooth: true
+                    opacity: 0.7
+                }
             }
         }
     }
@@ -146,24 +167,6 @@ ApplicationWindow {
 
     ListModel {
         id: mapTypeModel
-    }
-
-    ComboBox {
-        id: mapTypeCombo
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.margins: 5
-        model: mapTypeModel
-        textRole: "name"
-        z: map.z + 1
-        visible: map.visible
-        implicitWidth: 200
-        onCurrentIndexChanged: {
-            if (currentText != "") {
-                map.activeMapType = model.get(currentIndex).data
-                map.update()
-            }
-        }
     }
 
     ToolButton {
@@ -579,14 +582,12 @@ ApplicationWindow {
     }
 
     function switchToResults() {
-        map.visible = false
-        resultsView.visible = true
+        resultsView.width = 400
         resultsView.forceActiveFocus()
     }
 
     function switchToMap() {
-        resultsView.visible = false
-        map.visible = true
+        resultsView.width = 0
         map.forceActiveFocus()
     }
 
