@@ -37,10 +37,12 @@ GeocodeModel {
                     map.removeMapItem(map.markerPlace);
                     addMarker(currentPlace.coordinate);
                 }
+
                 if (currentPlace.boundingBox.isValid)
                     map.fitViewportToGeoShape(currentPlace.boundingBox)
                 else
                     map.fitViewportToGeoShape(QtPositioning.circle(makeCoords(currentPlace), 100))
+
                 if (currentSearchField == "start")
                     start = makeCoords(currentPlace)
                 else if (currentSearchField == "destination")

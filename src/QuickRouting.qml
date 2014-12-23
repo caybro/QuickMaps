@@ -2,7 +2,6 @@ import QtQuick 2.4
 import QtLocation 5.3
 
 RouteModel {
-    id: routeModel
     autoUpdate: false
     onStatusChanged: {
         if (status == RouteModel.Ready) {

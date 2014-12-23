@@ -20,7 +20,6 @@ import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 
 ScrollView {
-    id: resultsScrollView
     width: 0
     Layout.maximumWidth: map*.4
 

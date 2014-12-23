@@ -71,20 +71,6 @@ ApplicationWindow {
         print("Supports dynamic routing, based on current position: " + plugin.supportsRouting(Plugin.RouteUpdatesFeature))
         print("Supports routing alternatives: " + plugin.supportsRouting(Plugin.AlternativeRoutesFeature))
 
-        var maps = map.supportedMapTypes;
-        print("Supported map types: " + maps.length)
-        for (var i = 0; i < maps.length; i++){
-            print(maps[i].name + " (" + maps[i].description + ")");
-            print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
-            if (mobile) {
-                if (maps[i].mobile) {
-                    mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
-                }
-            } else {
-                mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
-            }
-        }
-
         map.forceActiveFocus()
     }
 
@@ -118,22 +104,6 @@ ApplicationWindow {
             id: map
             plugin: plugin
 
-            ComboBox {
-                id: mapTypeCombo
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.margins: 5
-                model: mapTypeModel
-                textRole: "name"
-                z: parent.z + 1
-                visible: parent.visible
-                implicitWidth: 200
-                onActivated: {
-                    map.activeMapType = model.get(index).data
-                    map.update()
-                }
-            }
-
             MapItemView {
                 id: mapItemView
                 model: routing
@@ -163,10 +133,6 @@ ApplicationWindow {
         travelModes: RouteQuery.CarTravel
         routeOptimizations: RouteQuery.FastestRoute
         //numberAlternativeRoutes: 2
-    }
-
-    ListModel {
-        id: mapTypeModel
     }
 
     ToolButton {
@@ -276,6 +242,7 @@ ApplicationWindow {
         id: goNavigateAction
         text: qsTr("Directions")
         iconSource: "qrc:/icons/ic_directions_24px.svg"
+        shortcut: "Ctrl+N"
         checkable: true
         onCheckedChanged: {
             if (!checked) {

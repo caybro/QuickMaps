@@ -57,6 +57,22 @@ Map {
                 zoomOut()
             }
         }
+
+        ComboBox {
+            id: mapTypeCombo
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.margins: 5
+            model: mapTypeModel
+            textRole: "name"
+            z: parent.z + 1
+            visible: parent.visible
+            implicitWidth: 200
+            onActivated: {
+                map.activeMapType = model.get(index).data
+                map.update()
+            }
+        }
         
         Menu {
             id: contextMenu
@@ -139,6 +155,10 @@ Map {
         radius: GeoLocation.accuracy
         visible: goHomeAction.checked
     }
+
+    ListModel {
+        id: mapTypeModel
+    }
     
     Component.onDestruction: {
         settings.latitude = map.center.latitude
@@ -146,6 +166,20 @@ Map {
     }
     
     Component.onCompleted: {
+        var maps = map.supportedMapTypes;
+        print("Supported map types: " + maps.length)
+        for (var i = 0; i < maps.length; i++){
+            print(maps[i].name + " (" + maps[i].description + ")");
+            print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
+            if (mobile) {
+                if (maps[i].mobile) {
+                    mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
+                }
+            } else {
+                mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
+            }
+        }
+
         map.center.latitude = settings.latitude
         map.center.longitude = settings.longitude
     }
