@@ -24,6 +24,7 @@ ScrollView {
     Layout.maximumWidth: map*.4
 
     Behavior on width {
+        enabled: !splitView.resizing
         NumberAnimation { duration: 300 }
     }
 
