@@ -511,25 +511,41 @@ ApplicationWindow {
             checkable: true
             checked: true
             exclusiveGroup: directionsOptionGroup
+            onTriggered: {
+                if (checked)
+                    routeQuery.routeOptimizations = RouteQuery.FastestRoute
+            }
         }
         MenuItem {
             id: shortestOptionItem
             text: qsTr("&Shortest route")
             checkable: true
             exclusiveGroup: directionsOptionGroup
+            onTriggered: {
+                if (checked)
+                    routeQuery.routeOptimizations = RouteQuery.ShortestRoute
+            }
         }
-        MenuItem {
-            id: economicOptionItem
-            text: qsTr("Most &economic route")
-            checkable: true
-            exclusiveGroup: directionsOptionGroup
-        }
-        MenuItem {
-            id: scenicOptionItem
-            text: qsTr("Most s&cenic route")
-            checkable: true
-            exclusiveGroup: directionsOptionGroup
-        }
+//        MenuItem { // FIXME those 2 options not supported by here.com
+//            id: economicOptionItem
+//            text: qsTr("Most &economic route")
+//            checkable: true
+//            exclusiveGroup: directionsOptionGroup
+//            onTriggered: {
+//                if (checked)
+//                    routeQuery.routeOptimizations = RouteQuery.MostEconomicRoute
+//            }
+//        }
+//        MenuItem {
+//            id: scenicOptionItem
+//            text: qsTr("Most s&cenic route")
+//            checkable: true
+//            exclusiveGroup: directionsOptionGroup
+//            onTriggered: {
+//                if (checked)
+//                    routeQuery.routeOptimizations = RouteQuery.MostScenicRoute
+//            }
+//        }
     }
 
     statusBar: StatusBar {
