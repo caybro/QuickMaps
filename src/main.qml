@@ -19,7 +19,6 @@ import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
-//import QtQuick.Dialogs 1.2
 import QtLocation 5.3
 import QtPositioning 5.2
 import Qt.labs.settings 1.0
@@ -114,10 +113,39 @@ ApplicationWindow {
     QuickMap {
         id: map
         plugin: plugin
+
+        MapItemView {
+            model: routing
+            delegate: routeDelegate
+        }
+
+        Component {
+            id: routeDelegate
+
+            MapRoute {
+                route: routeData
+                line.color: "darkblue"
+                line.width: 5
+                smooth: true
+                opacity: 0.8
+            }
+        }
     }
 
     QuickGeocodeModel {
         id: geocodeModel
+    }
+
+    QuickRouting {
+        id: routing
+        plugin: plugin
+        query: routeQuery
+    }
+
+    RouteQuery {
+        id: routeQuery
+        travelModes: RouteQuery.CarTravel
+        routeOptimizations: RouteQuery.FastestRoute
     }
 
     ListModel {
@@ -250,6 +278,12 @@ ApplicationWindow {
         text: qsTr("Directions")
         iconSource: "qrc:/icons/ic_directions_24px.svg"
         checkable: true
+        onCheckedChanged: {
+            if (!checked) {
+                map.clearMapItems()
+                routing.reset()
+            }
+        }
     }
 
     Action {
@@ -367,13 +401,134 @@ ApplicationWindow {
             ToolButton {
                 id: directionsButton
                 action: goNavigateAction
+            }
+            ToolButton {
+                id: directionsModeButton
+                iconSource: directionsGroup.current.iconSource
+                tooltip: directionsGroup.current.text
+                visible: directionsMode
+                enabled: start.isValid && destination.isValid
+                menu: directionsModeMenu
 
+                BusyIndicator {
+                    running: routing.status == RouteModel.Loading
+                    anchors.fill: parent
+                }
             }
             Item { Layout.preferredWidth: 10 }
             ToolButton {
                 action: fullscreenAction
                 visible: !mobile
             }
+        }
+    }
+
+    Menu {
+        id: directionsModeMenu
+        ExclusiveGroup {
+            id: directionsGroup
+            current: carModeItem
+        }
+        MenuItem {
+            id: carModeItem
+            text: qsTr("Drive")
+            iconSource: "qrc:/icons/ic_directions_car_24px.svg"
+            exclusiveGroup: directionsGroup
+            onTriggered: {
+                directionsGroup.current = carModeItem
+                print("Go by car!!!")
+                routing.reset()
+                routeQuery.clearWaypoints()
+                routeQuery.travelModes = RouteQuery.CarTravel
+                print("Adding " + printCoords(start) + " as start")
+                routeQuery.addWaypoint(start)
+                print("Adding " + printCoords(destination) + " as destination")
+                routeQuery.addWaypoint(destination)
+                routing.update()
+            }
+        }
+        MenuItem {
+            id: pedestrianModeItem
+            text: qsTr("Walk")
+            iconSource: "qrc:/icons/ic_directions_walk_24px.svg"
+            exclusiveGroup: directionsGroup
+            onTriggered: {
+                directionsGroup.current = pedestrianModeItem
+                print("Walk!!!")
+                routing.reset()
+                routeQuery.clearWaypoints()
+                routeQuery.travelModes = RouteQuery.PedestrianTravel
+                print("Adding " + printCoords(start) + " as start")
+                routeQuery.addWaypoint(start)
+                print("Adding " + printCoords(destination) + " as destination")
+                routeQuery.addWaypoint(destination)
+                routing.update()
+            }
+        }
+//        MenuItem { // FIXME broken in here.com
+//            id: bicycleModeItem
+//            text: qsTr("Bicycle directions")
+//            iconSource: "qrc:/icons/ic_directions_bike_24px.svg"
+//            exclusiveGroup: directionsGroup
+//            onTriggered: {
+//                directionsGroup.current = bicycleModeItem
+//                print("Bike!!!")
+//                routing.reset()
+//                routeQuery.clearWaypoints()
+//                routeQuery.travelModes = RouteQuery.BicycleTravel
+//                print("Adding " + printCoords(start) + " as start")
+//                routeQuery.addWaypoint(start)
+//                print("Adding " + printCoords(destination) + " as destination")
+//                routeQuery.addWaypoint(destination)
+//                routing.update()
+//            }
+//        }
+        MenuItem {
+            id: transitModeItem
+            text: qsTr("Public Transport")
+            iconSource: "qrc:/icons/ic_directions_transit_24px.svg"
+            exclusiveGroup: directionsGroup
+            onTriggered: {
+                directionsGroup.current = transitModeItem
+                print("Transit!!!")
+                routing.reset()
+                routeQuery.clearWaypoints()
+                routeQuery.travelModes = RouteQuery.PublicTransitTravel
+                print("Adding " + printCoords(start) + " as start")
+                routeQuery.addWaypoint(start)
+                print("Adding " + printCoords(destination) + " as destination")
+                routeQuery.addWaypoint(destination)
+                routing.update()
+            }
+        }
+        MenuSeparator {}
+        ExclusiveGroup {
+            id: directionsOptionGroup
+        }
+        MenuItem {
+            id: fastestOptionItem
+            text: qsTr("&Fastest route")
+            checkable: true
+            checked: true
+            exclusiveGroup: directionsOptionGroup
+        }
+        MenuItem {
+            id: shortestOptionItem
+            text: qsTr("&Shortest route")
+            checkable: true
+            exclusiveGroup: directionsOptionGroup
+        }
+        MenuItem {
+            id: economicOptionItem
+            text: qsTr("Most &economic route")
+            checkable: true
+            exclusiveGroup: directionsOptionGroup
+        }
+        MenuItem {
+            id: scenicOptionItem
+            text: qsTr("Most s&cenic route")
+            checkable: true
+            exclusiveGroup: directionsOptionGroup
         }
     }
 
