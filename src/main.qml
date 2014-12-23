@@ -102,7 +102,7 @@ ApplicationWindow {
 
     Plugin {
         id: geocodePlugin
-        name: "osm" // the nokia geocode plugin seems to always return only 1 result...
+        name: "osm" // BUG the nokia geocode plugin seems to always return only 1 result...
         PluginParameter { name: "useragent"; value: "QuickMaps" }
     }
 
@@ -115,19 +115,14 @@ ApplicationWindow {
         plugin: plugin
 
         MapItemView {
+            id: mapItemView
             model: routing
-            delegate: routeDelegate
-        }
-
-        Component {
-            id: routeDelegate
-
-            MapRoute {
+            delegate: MapRoute {
                 route: routeData
-                line.color: "darkblue"
+                line.color: "maroon"
                 line.width: 5
                 smooth: true
-                opacity: 0.8
+                opacity: 0.7
             }
         }
     }
@@ -146,6 +141,7 @@ ApplicationWindow {
         id: routeQuery
         travelModes: RouteQuery.CarTravel
         routeOptimizations: RouteQuery.FastestRoute
+        //numberAlternativeRoutes: 2
     }
 
     ListModel {
@@ -465,24 +461,24 @@ ApplicationWindow {
                 routing.update()
             }
         }
-//        MenuItem { // FIXME broken in here.com
-//            id: bicycleModeItem
-//            text: qsTr("Bicycle directions")
-//            iconSource: "qrc:/icons/ic_directions_bike_24px.svg"
-//            exclusiveGroup: directionsGroup
-//            onTriggered: {
-//                directionsGroup.current = bicycleModeItem
-//                print("Bike!!!")
-//                routing.reset()
-//                routeQuery.clearWaypoints()
-//                routeQuery.travelModes = RouteQuery.BicycleTravel
-//                print("Adding " + printCoords(start) + " as start")
-//                routeQuery.addWaypoint(start)
-//                print("Adding " + printCoords(destination) + " as destination")
-//                routeQuery.addWaypoint(destination)
-//                routing.update()
-//            }
-//        }
+        //        MenuItem { // BUG broken in here.com
+        //            id: bicycleModeItem
+        //            text: qsTr("Bicycle directions")
+        //            iconSource: "qrc:/icons/ic_directions_bike_24px.svg"
+        //            exclusiveGroup: directionsGroup
+        //            onTriggered: {
+        //                directionsGroup.current = bicycleModeItem
+        //                print("Bike!!!")
+        //                routing.reset()
+        //                routeQuery.clearWaypoints()
+        //                routeQuery.travelModes = RouteQuery.BicycleTravel
+        //                print("Adding " + printCoords(start) + " as start")
+        //                routeQuery.addWaypoint(start)
+        //                print("Adding " + printCoords(destination) + " as destination")
+        //                routeQuery.addWaypoint(destination)
+        //                routing.update()
+        //            }
+        //        }
         MenuItem {
             id: transitModeItem
             text: qsTr("Public Transport")
@@ -526,26 +522,26 @@ ApplicationWindow {
                     routeQuery.routeOptimizations = RouteQuery.ShortestRoute
             }
         }
-//        MenuItem { // FIXME those 2 options not supported by here.com
-//            id: economicOptionItem
-//            text: qsTr("Most &economic route")
-//            checkable: true
-//            exclusiveGroup: directionsOptionGroup
-//            onTriggered: {
-//                if (checked)
-//                    routeQuery.routeOptimizations = RouteQuery.MostEconomicRoute
-//            }
-//        }
-//        MenuItem {
-//            id: scenicOptionItem
-//            text: qsTr("Most s&cenic route")
-//            checkable: true
-//            exclusiveGroup: directionsOptionGroup
-//            onTriggered: {
-//                if (checked)
-//                    routeQuery.routeOptimizations = RouteQuery.MostScenicRoute
-//            }
-//        }
+        //        MenuItem { // FIXME those 2 options not supported by here.com
+        //            id: economicOptionItem
+        //            text: qsTr("Most &economic route")
+        //            checkable: true
+        //            exclusiveGroup: directionsOptionGroup
+        //            onTriggered: {
+        //                if (checked)
+        //                    routeQuery.routeOptimizations = RouteQuery.MostEconomicRoute
+        //            }
+        //        }
+        //        MenuItem {
+        //            id: scenicOptionItem
+        //            text: qsTr("Most s&cenic route")
+        //            checkable: true
+        //            exclusiveGroup: directionsOptionGroup
+        //            onTriggered: {
+        //                if (checked)
+        //                    routeQuery.routeOptimizations = RouteQuery.MostScenicRoute
+        //            }
+        //        }
     }
 
     statusBar: StatusBar {
