@@ -23,7 +23,6 @@ import QtPositioning 5.2
 
 Map {
     id: map
-    Layout.fillWidth: true
     focus: true
 
     property alias markerPlace: markerPlace

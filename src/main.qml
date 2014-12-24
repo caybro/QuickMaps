@@ -549,6 +549,7 @@ ApplicationWindow {
     }
 
     function switchToResults() {
+        resultsView.visible = true
         resultsView.width = 400
         resultsView.forceActiveFocus()
     }

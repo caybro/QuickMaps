@@ -20,12 +20,17 @@ import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 
 ScrollView {
+    visible: false
     width: 0
     Layout.maximumWidth: map*.4
 
     Behavior on width {
         enabled: !splitView.resizing
         NumberAnimation { duration: 300 }
+    }
+
+    onWidthChanged: {
+        if (width == 0) visible = false;
     }
 
     ListView {
