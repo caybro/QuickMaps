@@ -246,9 +246,10 @@ ApplicationWindow {
         checkable: true
         onCheckedChanged: {
             if (!checked) {
-                map.clearMapItems()
                 routing.reset()
             }
+            map.markerStart.visible = checked
+            map.markerDestination.visible = checked
         }
     }
 
