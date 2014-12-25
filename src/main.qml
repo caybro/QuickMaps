@@ -171,7 +171,6 @@ ApplicationWindow {
         plugin: plugin
         limit: 30
         searchArea: QtPositioning.circle(map.center)
-        //searchTerm: input.text
 
         onStatusChanged: {
             if (status == PlaceSearchModel.Ready) {
@@ -213,8 +212,8 @@ ApplicationWindow {
 
     RouteQuery {
         id: routeQuery
-        travelModes: RouteQuery.CarTravel
-        routeOptimizations: RouteQuery.FastestRoute
+        travelModes: directionsGroup.current.featureType
+        routeOptimizations: fastestOptionItem.checked ? RouteQuery.FastestRoute : RouteQuery.ShortestRoute
         //numberAlternativeRoutes: 2
     }
 
@@ -324,11 +323,13 @@ ApplicationWindow {
         shortcut: "Ctrl+N"
         checkable: true
         onCheckedChanged: {
-            if (!checked)
+            if (checked) {
+                placeSearchModel.reset()
+                if (start.isValid && destination.isValid)
+                    carModeItem.trigger()
+            } else {
                 routing.reset()
-
-            map.markerStart.visible = checked
-            map.markerDestination.visible = checked
+            }
         }
     }
 
@@ -481,17 +482,11 @@ ApplicationWindow {
             text: qsTr("Drive")
             iconSource: "qrc:/icons/ic_directions_car_24px.svg"
             exclusiveGroup: directionsGroup
+            property int featureType: RouteQuery.CarTravel
             onTriggered: {
                 directionsGroup.current = carModeItem
                 print("Go by car!!!")
-                routing.reset()
-                routeQuery.clearWaypoints()
-                routeQuery.travelModes = RouteQuery.CarTravel
-                print("Adding " + printCoords(start) + " as start")
-                routeQuery.addWaypoint(start)
-                print("Adding " + printCoords(destination) + " as destination")
-                routeQuery.addWaypoint(destination)
-                routing.update()
+                findDirections()
             }
         }
         MenuItem {
@@ -499,53 +494,23 @@ ApplicationWindow {
             text: qsTr("Walk")
             iconSource: "qrc:/icons/ic_directions_walk_24px.svg"
             exclusiveGroup: directionsGroup
+            property int featureType: RouteQuery.PedestrianTravel
             onTriggered: {
                 directionsGroup.current = pedestrianModeItem
                 print("Walk!!!")
-                routing.reset()
-                routeQuery.clearWaypoints()
-                routeQuery.travelModes = RouteQuery.PedestrianTravel
-                print("Adding " + printCoords(start) + " as start")
-                routeQuery.addWaypoint(start)
-                print("Adding " + printCoords(destination) + " as destination")
-                routeQuery.addWaypoint(destination)
-                routing.update()
+                findDirections()
             }
         }
-        //        MenuItem { // BUG broken in here.com
-        //            id: bicycleModeItem
-        //            text: qsTr("Bicycle directions")
-        //            iconSource: "qrc:/icons/ic_directions_bike_24px.svg"
-        //            exclusiveGroup: directionsGroup
-        //            onTriggered: {
-        //                directionsGroup.current = bicycleModeItem
-        //                print("Bike!!!")
-        //                routing.reset()
-        //                routeQuery.clearWaypoints()
-        //                routeQuery.travelModes = RouteQuery.BicycleTravel
-        //                print("Adding " + printCoords(start) + " as start")
-        //                routeQuery.addWaypoint(start)
-        //                print("Adding " + printCoords(destination) + " as destination")
-        //                routeQuery.addWaypoint(destination)
-        //                routing.update()
-        //            }
-        //        }
         MenuItem {
             id: transitModeItem
             text: qsTr("Public Transport")
             iconSource: "qrc:/icons/ic_directions_transit_24px.svg"
             exclusiveGroup: directionsGroup
+            property int featureType: RouteQuery.PublicTransitTravel
             onTriggered: {
                 directionsGroup.current = transitModeItem
                 print("Transit!!!")
-                routing.reset()
-                routeQuery.clearWaypoints()
-                routeQuery.travelModes = RouteQuery.PublicTransitTravel
-                print("Adding " + printCoords(start) + " as start")
-                routeQuery.addWaypoint(start)
-                print("Adding " + printCoords(destination) + " as destination")
-                routeQuery.addWaypoint(destination)
-                routing.update()
+                findDirections()
             }
         }
         MenuSeparator {}
@@ -558,21 +523,50 @@ ApplicationWindow {
             checkable: true
             checked: true
             exclusiveGroup: directionsOptionGroup
-            onTriggered: {
-                if (checked)
-                    routeQuery.routeOptimizations = RouteQuery.FastestRoute
-            }
         }
         MenuItem {
             id: shortestOptionItem
             text: qsTr("&Shortest route")
             checkable: true
             exclusiveGroup: directionsOptionGroup
-            onTriggered: {
-                if (checked)
-                    routeQuery.routeOptimizations = RouteQuery.ShortestRoute
-            }
         }
+        MenuSeparator {}
+        MenuItem {
+            id: featureToll
+            text: qsTr("Toll roads")
+            checkable: true
+            checked: true
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.TollFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.DisallowFeatureWeight)
+        }
+        MenuItem {
+            id: featureHighway
+            text: qsTr("Highways")
+            checkable: true
+            checked: true
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.HighwayFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+        }
+        MenuItem {
+            id: featureTunnel
+            text: qsTr("Tunnels")
+            checkable: true
+            checked: true
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.TunnelFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+        }
+        MenuItem {
+            id: featureDirtRoad
+            text: qsTr("Unpaved roads")
+            checkable: true
+            checked: true
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.DirtRoadFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+        }
+        MenuItem {
+            id: featureFerry
+            text: qsTr("Ferries")
+            checkable: true
+            checked: true
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.FerryFeature, featureFerry.checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+        }
+
         //        MenuItem { // FIXME those 2 options not supported by here.com
         //            id: economicOptionItem
         //            text: qsTr("Most &economic route")
@@ -641,5 +635,16 @@ ApplicationWindow {
 
     function printCoords(coord) {
         return coord.latitude + "," + coord.longitude
+    }
+
+    function findDirections() {
+        // TODO find and switch to the appropriate map type
+        routing.reset()
+        routeQuery.clearWaypoints()
+        print("Adding " + printCoords(start) + " as start")
+        routeQuery.addWaypoint(start)
+        print("Adding " + printCoords(destination) + " as destination")
+        routeQuery.addWaypoint(destination)
+        //routing.update()
     }
 }

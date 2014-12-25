@@ -19,7 +19,7 @@ import QtQuick 2.4
 import QtLocation 5.3
 
 RouteModel {
-    autoUpdate: false
+    autoUpdate: true
     onStatusChanged: {
         if (status == RouteModel.Ready) {
             print("Routing query returned " + count + " results")

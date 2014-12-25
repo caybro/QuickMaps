@@ -111,7 +111,7 @@ Map {
         anchorPoint.x: imageStart.width/4
         anchorPoint.y: imageStart.height
         coordinate: start
-        visible: start.isValid
+        visible: start.isValid && directionsMode
 
         sourceItem: Image {
             id: imageStart
@@ -124,7 +124,7 @@ Map {
         anchorPoint.x: imageDest.width/4
         anchorPoint.y: imageDest.height
         coordinate: destination
-        visible: destination.isValid
+        visible: destination.isValid && directionsMode
 
         sourceItem: Image {
             id: imageDest
