@@ -8,7 +8,7 @@ SOURCES += main.cpp \
     geolocation.cpp
 
 lupdate_only{
-SOURCES += main.qml ResultsView.qml QuickMap.qml QuickGeocodeModel.qml QuickRouting.qml
+SOURCES += main.qml ResultsView.qml QuickMap.qml QuickRouting.qml
 }
 
 RESOURCES += qml.qrc

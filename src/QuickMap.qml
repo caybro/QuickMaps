@@ -25,7 +25,6 @@ Map {
     id: map
     focus: true
 
-    property alias markerPlace: markerPlace
     property alias markerStart: markerStart
     property alias markerDestination: markerDestination
     property alias homeCircle: homeCircle
@@ -64,7 +63,7 @@ Map {
             anchors.margins: 5
             model: mapTypeModel
             textRole: "name"
-            z: parent.z + 1
+            z: parent.z + 2
             visible: parent.visible
             implicitWidth: 200
             onActivated: {
@@ -80,8 +79,8 @@ Map {
                 onTriggered: {
                     //print("Coord: " + map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY)))
                     currentSearchField = ""
-                    geocodeModel.query = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
-                    geocodeModel.update();
+                    placeSearchModel.searchTerm = printCoords(map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY)))
+                    placeSearchModel.update();
                 }
             }
             MenuItem {
@@ -104,19 +103,6 @@ Map {
                     inputDestination.text = printCoords(here)
                 }
             }
-        }
-    }
-
-    MapQuickItem {
-        id: markerPlace
-        anchorPoint.x: image.width/4
-        anchorPoint.y: image.height
-
-        property string messageText
-
-        sourceItem: Image {
-            id: image
-            source: "qrc:/icons/ic_pin_drop_24px.svg"
         }
     }
 

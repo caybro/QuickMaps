@@ -32,6 +32,8 @@ ApplicationWindow {
     height: 480
     title: "Quick Maps"
 
+    property int windowVisibility
+
     property bool mobile: ["android", "ios", "blackberry", "wince"].some(function(element) {
         return element === Qt.platform.os;
     });
@@ -115,11 +117,92 @@ ApplicationWindow {
                     opacity: 0.7
                 }
             }
+
+            MapItemView {
+                id: placesView
+                model: placeSearchModel
+                delegate: MapQuickItem {
+                    anchorPoint.x: image.width/2
+                    anchorPoint.y: image.height
+                    coordinate: place.location.coordinate
+
+                    sourceItem: Column {
+                        Text {
+                            id: placeText
+                            text: title
+                            anchors.horizontalCenter: image.horizontalCenter
+                            visible: (placeSearchModel.count > 1 && map.zoomLevel > 12)
+                                     || (placeSearchModel.count == 1 && map.zoomLevel < 7)
+                        }
+                        Image {
+                            id: image
+                            source: place.icon.url()
+                            width: 48
+                            height: 48
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            if (!place.detailsFetched)
+                                place.getDetails()
+                            //print("Clicked place type: " + type)
+                            messageLabel.text = place.name + " (" + place.location.address.text.replace(/<br\/>/g, ", ") + ")"
+                            // TODO display some info box with links and navigation features
+                        }
+                    }
+                }
+            }
+
+            onCenterChanged: {
+                if (!directionsMode) {
+                    if (placeSearchModel.searchTerm != "") // FIXME needs a timer or something
+                        placeSearchModel.update()
+                }
+            }
         }
     }
 
-    QuickGeocodeModel {
-        id: geocodeModel
+    PlaceSearchModel {
+        id: placeSearchModel
+        plugin: plugin
+        limit: 30
+        searchArea: QtPositioning.circle(map.center)
+        //searchTerm: input.text
+
+        onStatusChanged: {
+            if (status == PlaceSearchModel.Ready) {
+                searchTerm = ""
+                print ("Got " + count + " place search results")
+                if (count == 1) {
+                    var currentPlace = data(0, "place").location
+
+                    if (currentSearchField == "start")
+                        start = makeCoords(currentPlace)
+                    else if (currentSearchField == "destination")
+                        destination = makeCoords(currentPlace)
+
+                    messageLabel.text = data(0, "title") + " (" + currentPlace.address.text.replace(/<br\/>/g, ", ") + ")"
+
+                    if (currentPlace.boundingBox.isValid)
+                        map.fitViewportToGeoShape(currentPlace.boundingBox)
+                    else
+                        map.fitViewportToGeoShape(QtPositioning.circle(makeCoords(currentPlace), 100))
+                    switchToMap()
+                } else if (count > 1) {
+                    messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
+                    switchToResults()
+                } else {
+                    print ("Got no results from " + currentSearchField)
+                    messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
+                }
+            } else if (status == PlaceSearchModel.Error) {
+                print("Places Search error: " + errorString())
+            }
+        }
     }
 
     QuickRouting {
@@ -192,11 +275,10 @@ ApplicationWindow {
         shortcut: StandardKey.Find
         enabled: false
         onTriggered: {
-            geocodeModel.reset()
             var text = currentSearchField == "destination" ? inputDestination.text : input.text
             print("Current query: " + text + " (searching for " + currentSearchField + ")");
-            geocodeModel.query = text;
-            geocodeModel.update();
+            placeSearchModel.searchTerm = text
+            placeSearchModel.update()
         }
     }
 
@@ -206,7 +288,7 @@ ApplicationWindow {
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconSource: "qrc:/icons/ic_arrow_back_24px.svg"
         shortcut: StandardKey.Back
-        enabled: (map.visible && geocodeModel.count > 1) || !map.visible
+        enabled: (map.visible && placeSearchModel.count > 1) || !map.visible
         onTriggered: {
             if (map.visible)
                 switchToResults()
@@ -225,15 +307,12 @@ ApplicationWindow {
         checkable: true
         onTriggered: {
             if (checked) {
-                map.markerPlace.messageText = messageLabel.text
                 messageLabel.text = GeoLocation.description
                 map.fitViewportToGeoShape(QtPositioning.circle(map.homeCircle.center, map.homeCircle.radius))
             } else {
-                messageLabel.text = map.markerPlace.messageText
+                messageLabel.text = ""
                 if (directionsMode)
                     map.fitViewportToGeoShape(QtPositioning.circle(map.markerStart.coordinate, 100))
-                else
-                    map.fitViewportToGeoShape(QtPositioning.circle(map.markerPlace.coordinate, 1000))
             }
         }
     }
@@ -245,9 +324,9 @@ ApplicationWindow {
         shortcut: "Ctrl+N"
         checkable: true
         onCheckedChanged: {
-            if (!checked) {
+            if (!checked)
                 routing.reset()
-            }
+
             map.markerStart.visible = checked
             map.markerDestination.visible = checked
         }
@@ -285,7 +364,7 @@ ApplicationWindow {
                     }
                 }
                 onTextChanged: {
-                    goAction.enabled = text != "" && geocodeModel.status != GeocodeModel.Loading
+                    goAction.enabled = text != "" && placeSearchModel.status != PlaceSearchModel.Loading
                 }
                 Image {
                     anchors.right: parent.right
@@ -297,11 +376,11 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.margins: 3
                     source: "qrc:/icons/ic_warning_24px.svg"
-                    visible: input.text != "" && geocodeModel.count == 0
-                             && currentSearchField == "start" && geocodeModel.status == GeocodeModel.Ready
+                    visible: input.text != "" && placeSearchModel.count == 0
+                             && currentSearchField == "start" && placeSearchModel.status == PlaceSearchModel.Ready
                 }
                 BusyIndicator {
-                    running: geocodeModel.status == GeocodeModel.Loading && currentSearchField == "start"
+                    running: placeSearchModel.status == PlaceSearchModel.Loading
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     height: parent.childrenRect.height - 5
@@ -323,6 +402,7 @@ ApplicationWindow {
                     inputDestination.text = tmpText;
                 }
             }
+
             TextField {
                 id: inputDestination
                 Layout.fillWidth: true
@@ -338,7 +418,7 @@ ApplicationWindow {
                     }
                 }
                 onTextChanged: {
-                    goAction.enabled = text != "" && geocodeModel.status != GeocodeModel.Loading
+                    goAction.enabled = text != "" && placeSearchModel.status != PlaceSearchModel.Loading
                 }
                 Image {
                     anchors.right: parent.right
@@ -350,11 +430,11 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.margins: 3
                     source: "qrc:/icons/ic_warning_24px.svg"
-                    visible: input.text != "" && geocodeModel.count == 0 &&
-                             currentSearchField == "destination" && geocodeModel.status == GeocodeModel.Ready
+                    visible: input.text != "" && placeSearchModel.count == 0 &&
+                             currentSearchField == "destination" && placeSearchModel.status == PlaceSearchModel.Ready
                 }
                 BusyIndicator {
-                    running: geocodeModel.status == GeocodeModel.Loading && currentSearchField == "destination"
+                    running: placeSearchModel.status == PlaceSearchModel.Loading && currentSearchField == "destination"
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     height: parent.childrenRect.height - 5
@@ -536,22 +616,17 @@ ApplicationWindow {
 
     function toggleFullscreen() {
         if (mainWindow.visibility == Window.FullScreen)
-            mainWindow.visibility = Window.Windowed
+            mainWindow.visibility = windowVisibility
         else {
+            windowVisibility = mainWindow.visibility
             mainWindow.visibility = Window.FullScreen
             map.forceActiveFocus()
         }
     }
 
-    function addMarker(coord) {
-        map.markerPlace.coordinate = coord
-        map.addMapItem(map.markerPlace);
-        print("Added marker for place: " + printCoords(coord))
-    }
-
     function switchToResults() {
         resultsView.visible = true
-        resultsView.width = 400
+        resultsView.width = 200
         resultsView.forceActiveFocus()
     }
 

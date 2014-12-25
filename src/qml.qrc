@@ -24,7 +24,6 @@
         <file>icons/ic_remove_24px.svg</file>
         <file>ResultsView.qml</file>
         <file>QuickMap.qml</file>
-        <file>QuickGeocodeModel.qml</file>
         <file>QuickRouting.qml</file>
         <file>icons/ic_directions_car_24px.svg</file>
         <file>icons/ic_directions_walk_24px.svg</file>

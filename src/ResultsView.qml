@@ -18,6 +18,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
+import QtPositioning 5.2
 
 ScrollView {
     visible: false
@@ -36,29 +37,31 @@ ScrollView {
     ListView {
         id: resultsView
         focus: true
-        model: geocodeModel
+        model: placeSearchModel
         delegate: placeDelegate
         highlight: highlightDelegate
         highlightFollowsCurrentItem: false
         spacing: 5
         clip: true
-        section.property: "locationData.address.country"
+        section.property: "place.location.address.countryCode"  //FIXME
         section.delegate: sectionHeading
         
         function selectPlace(index) {
-            var currentPlace = model.get(currentIndex);
-            if (currentSearchField == "" || !directionsMode) {
-                map.removeMapItem(map.markerPlace);
-                addMarker(currentPlace.coordinate)
-            }
-            print("Selecting " + currentPlace.address.text + " as " + currentSearchField);
-            messageLabel.text = currentPlace.address.text;
+            var currentPlace = model.data(currentIndex, "place").location
+            print("Selecting " + currentPlace.address.text + " as " + currentSearchField)
+            messageLabel.text = model.data(currentIndex, "title") + " (" + currentPlace.address.text.replace(/<br\/>/g, ", ") + ")"
+
             if (currentSearchField == "start") {
                 start = makeCoords(currentPlace)
             } else if (currentSearchField == "destination") {
                 destination = makeCoords(currentPlace)
             }
-            map.fitViewportToGeoShape(currentPlace.boundingBox)
+
+            if (currentPlace.boundingBox.isValid)
+                map.fitViewportToGeoShape(currentPlace.boundingBox)
+            else
+                map.fitViewportToGeoShape(QtPositioning.circle(makeCoords(currentPlace), 100))
+
             switchToMap()
         }
         
@@ -97,11 +100,15 @@ ScrollView {
             Column {
                 spacing: 5
                 Text {
-                    id: locationDelegate
-                    text: locationData.address.text;
+                    text: title
+                    font.bold: true
                 }
                 Text {
-                    text: printCoords(locationData.coordinate)
+                    id: locationDelegate
+                    text: place.location.address.text;
+                }
+                Text {
+                    text: printCoords(place.location.coordinate)
                     font.pointSize: locationDelegate.font.pointSize - 2
                 }
             }
