@@ -43,7 +43,7 @@ ScrollView {
         highlightFollowsCurrentItem: false
         spacing: 5
         clip: true
-        section.property: "place.location.address.countryCode"  //FIXME
+        section.property: "place.location.address.countryCode"  // FIXME sections don't work this way
         section.delegate: sectionHeading
         
         function selectPlace(index) {

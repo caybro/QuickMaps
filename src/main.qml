@@ -536,38 +536,43 @@ ApplicationWindow {
             text: qsTr("Toll roads")
             checkable: true
             checked: true
-            onTriggered: routeQuery.setFeatureWeight(RouteQuery.TollFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.DisallowFeatureWeight)
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.TollFeature,
+                                                     checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.DisallowFeatureWeight)
         }
         MenuItem {
             id: featureHighway
             text: qsTr("Highways")
             checkable: true
             checked: true
-            onTriggered: routeQuery.setFeatureWeight(RouteQuery.HighwayFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.HighwayFeature,
+                                                     checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
         }
         MenuItem {
             id: featureTunnel
             text: qsTr("Tunnels")
             checkable: true
             checked: true
-            onTriggered: routeQuery.setFeatureWeight(RouteQuery.TunnelFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.TunnelFeature,
+                                                     checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
         }
         MenuItem {
             id: featureDirtRoad
             text: qsTr("Unpaved roads")
             checkable: true
             checked: true
-            onTriggered: routeQuery.setFeatureWeight(RouteQuery.DirtRoadFeature, checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.DirtRoadFeature,
+                                                     checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
         }
         MenuItem {
             id: featureFerry
             text: qsTr("Ferries")
             checkable: true
             checked: true
-            onTriggered: routeQuery.setFeatureWeight(RouteQuery.FerryFeature, featureFerry.checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+            onTriggered: routeQuery.setFeatureWeight(RouteQuery.FerryFeature,
+                                                     featureFerry.checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
         }
 
-        //        MenuItem { // FIXME those 2 options not supported by here.com
+        //        MenuItem { // BUG those 2 options not supported by here.com
         //            id: economicOptionItem
         //            text: qsTr("Most &economic route")
         //            checkable: true
@@ -645,6 +650,5 @@ ApplicationWindow {
         routeQuery.addWaypoint(start)
         print("Adding " + printCoords(destination) + " as destination")
         routeQuery.addWaypoint(destination)
-        //routing.update()
     }
 }

@@ -29,6 +29,26 @@ Map {
     property alias markerDestination: markerDestination
     property alias homeCircle: homeCircle
 
+    GeocodeModel {
+        id: geocodeModel
+        plugin: map.plugin
+        onStatusChanged: {
+            if (status == GeocodeModel.Ready) {
+                print("Got " + count + " reverse geocode results")
+                if (count > 0) {
+                    var address = get(0).address.text.replace(/<br\/>/g, ", ")
+                    print("Here's address: " + address)
+                    if (currentSearchField == "start")
+                        input.text = address
+                    else if (currentSearchField == "destination")
+                        inputDestination.text = address
+                    else
+                        messageLabel.text = address
+                }
+            }
+        }
+    }
+
     MouseArea {
         id: mapMouseArea
         anchors.fill: parent
@@ -79,8 +99,8 @@ Map {
                 onTriggered: {
                     //print("Coord: " + map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY)))
                     currentSearchField = ""
-                    placeSearchModel.searchTerm = printCoords(map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY)))
-                    placeSearchModel.update();
+                    geocodeModel.query = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
+                    geocodeModel.update();
                 }
             }
             MenuItem {
@@ -90,7 +110,8 @@ Map {
                     var here = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
                     start = here
                     currentSearchField = "start"
-                    input.text = printCoords(here)
+                    geocodeModel.query = here
+                    geocodeModel.update();
                 }
             }
             MenuItem {
@@ -100,7 +121,8 @@ Map {
                     var here = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
                     destination = here
                     currentSearchField = "destination"
-                    inputDestination.text = printCoords(here)
+                    geocodeModel.query = here
+                    geocodeModel.update();
                 }
             }
         }
