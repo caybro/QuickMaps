@@ -31,7 +31,7 @@ Map {
 
     GeocodeModel {
         id: geocodeModel
-        plugin: map.plugin
+        plugin: geocodePlugin
         onStatusChanged: {
             if (status == GeocodeModel.Ready) {
                 print("Got " + count + " reverse geocode results")
