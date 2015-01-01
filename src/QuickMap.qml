@@ -75,22 +75,6 @@ Map {
                 zoomOut()
             }
         }
-
-        ComboBox {
-            id: mapTypeCombo
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.margins: 5
-            model: mapTypeModel
-            textRole: "name"
-            z: parent.z + 2
-            visible: parent.visible
-            implicitWidth: 200
-            onActivated: {
-                map.activeMapType = model.get(index).data
-                map.update()
-            }
-        }
         
         Menu {
             id: contextMenu
@@ -165,6 +149,22 @@ Map {
 
     ListModel {
         id: mapTypeModel
+    }
+
+    ComboBox {
+        id: mapTypeCombo
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.margins: 5
+        model: mapTypeModel
+        textRole: "name"
+        z: parent.z + 2
+        visible: parent.visible
+        implicitWidth: 200
+        onActivated: {
+            map.activeMapType = model.get(index).data
+            map.update()
+        }
     }
     
     Component.onDestruction: {
