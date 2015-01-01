@@ -381,7 +381,7 @@ ApplicationWindow {
                              && currentSearchField == "start" && placeSearchModel.status == PlaceSearchModel.Ready
                 }
                 BusyIndicator {
-                    running: placeSearchModel.status == PlaceSearchModel.Loading
+                    running: placeSearchModel.status == PlaceSearchModel.Loading && currentSearchField != "destination"
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     height: parent.childrenRect.height - 5
