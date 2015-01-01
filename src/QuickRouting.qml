@@ -28,6 +28,7 @@ RouteModel {
                 map.fitViewportToGeoShape(route.bounds)
                 print("Route measures " + route.distance + " meters and will take " + route.travelTime + " seconds")
                 messageLabel.text = qsTr("Route measures %1 kilometers and will take %2.").arg(formatMeters(route.distance)).arg(formatSeconds(route.travelTime))
+                printRoute(route)
             }
         } else if (status == RouteModel.Error) {
             print("Routing error: " + errorString + " (" + error + ")")
@@ -56,5 +57,22 @@ RouteModel {
             result += qsTranslate("", "%n second(s)", "", numseconds);
 
         return result;
+    }
+
+    function printRoute(route) {
+        print("--- Route details ---")
+        for (var i = 0; i < route.segments.length; i++) {
+            var segment = route.segments[i]
+            print("Segment " + i + ": " + segment.distance + " meters")
+            if (segment.maneuver.valid) {
+                print("Maneuver: " + segment.maneuver.instructionText)
+                print("Distance to next: " + segment.maneuver.distanceToNextInstruction + "m")
+                print("Time to next: " + segment.maneuver.timeToNextInstruction + "s")
+                print("Position: " + printCoords(segment.maneuver.position))
+                if (segment.maneuver.waypointValid)
+                    print("Waypoint: " + printCoords(segment.maneuver.waypoint))
+            }
+            print("---")
+        }
     }
 }
