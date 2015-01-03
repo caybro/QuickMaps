@@ -19,6 +19,7 @@ import QtQuick 2.4
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
+import QtQuick.Dialogs 1.1
 import QtLocation 5.3
 import QtPositioning 5.2
 import Qt.labs.settings 1.0
@@ -64,6 +65,8 @@ ApplicationWindow {
         print("Available services: " + plugin.availableServiceProviders)
         print("Actual mapping plugin: " + plugin.name)
         print("Min/max zooms: " + map.minimumZoomLevel + "/" + map.maximumZoomLevel)
+
+        print("\n\Here.com plugin\n--------------")
         print("Supports online maps: " + plugin.supportsMapping(Plugin.OnlineMappingFeature))
         print("Supports offline maps: " + plugin.supportsMapping(Plugin.OfflineMappingFeature))
         print("Supports localized maps: " + plugin.supportsMapping(Plugin.LocalizedMappingFeature))
@@ -73,11 +76,29 @@ ApplicationWindow {
         print("Supports dynamic routing, based on current position: " + plugin.supportsRouting(Plugin.RouteUpdatesFeature))
         print("Supports routing alternatives: " + plugin.supportsRouting(Plugin.AlternativeRoutesFeature))
 
+        print("\n\nOSM plugin\n--------------")
+        print("Supports online maps: " + geocodePlugin.supportsMapping(Plugin.OnlineMappingFeature))
+        print("Supports online routing: " + geocodePlugin.supportsRouting(Plugin.OnlineRoutingFeature))
+        print("Supports dynamic routing, based on current position: " + geocodePlugin.supportsRouting(Plugin.RouteUpdatesFeature))
+        print("Supports geocoding: " + geocodePlugin.supportsGeocoding(Plugin.OnlineGeocodingFeature))
+        print("Supports reverse geocoding: " + geocodePlugin.supportsGeocoding(Plugin.ReverseGeocodingFeature))
+        print("Supports places: " + geocodePlugin.supportsPlaces(Plugin.OnlinePlacesFeature))
+
         map.forceActiveFocus()
     }
 
     SystemPalette {
         id: palette
+    }
+
+    MessageDialog {
+        id: placeDetailsDlg
+        title: qsTr("Place Details")
+        icon: StandardIcon.Information
+        standardButtons: StandardButton.Ok
+        onAccepted: {
+            close()
+        }
     }
 
     Plugin {
@@ -122,6 +143,7 @@ ApplicationWindow {
                 id: placesView
                 model: placeSearchModel
                 delegate: MapQuickItem {
+                    id: placeDelegate
                     anchorPoint.x: image.width/2
                     anchorPoint.y: image.height
                     coordinate: place.location.coordinate
@@ -147,11 +169,39 @@ ApplicationWindow {
                         acceptedButtons: Qt.LeftButton
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (!place.detailsFetched)
-                                place.getDetails()
-                            //print("Clicked place type: " + type)
+                            print("Clicked place ID: " + place.placeId)
                             messageLabel.text = place.name + " (" + place.location.address.text.replace(/<br\/>/g, ", ") + ")"
-                            // TODO display some info box with links and navigation features
+                            placeMenu.popup()
+                        }
+
+                        Menu {
+                            id: placeMenu
+                            MenuItem {
+                                text: qsTr("&Details...")
+                                onTriggered: {
+                                    print("Details for place (ID): " + place.name + " (" + place.placeId + ")")
+
+                                    placeDetailsDlg.text = "<b>" + place.name + "</b><br><br>" +
+                                            qsTr("Address: %1").arg(place.location.address.text.replace(/<br\/>/g, ", ")) + "<br>" +
+                                            qsTr("Categories: %1").arg(listCategories(place.categories)) + "<br>" +
+                                            qsTr("Rating: %L1 stars").arg(place.ratings.average)
+                                    placeDetailsDlg.informativeText = "<small>" + printCoords(place.location.coordinate) + "</small>"
+                                    placeDetailsDlg.open()
+                                }
+                            }
+                            MenuItem {
+                                text: qsTr("Directions &here")
+                                iconSource: "qrc:/icons/ic_directions_24px.svg"
+                                enabled: place.location
+                                onTriggered: {
+                                    destination = makeCoords(place.location)
+                                    inputDestination.text = place.location.address.text.replace(/<br\/>/g, ", ")
+                                    start = QtPositioning.coordinate()
+                                    input.text = ""
+                                    input.forceActiveFocus()
+                                    goNavigateAction.checked = true
+                                }
+                            }
                         }
                     }
                 }
@@ -287,12 +337,12 @@ ApplicationWindow {
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconSource: "qrc:/icons/ic_arrow_back_24px.svg"
         shortcut: StandardKey.Back
-        enabled: (map.visible && placeSearchModel.count > 1) || !map.visible
+        enabled: resultsView.visible || placeSearchModel.count > 1
         onTriggered: {
-            if (map.visible)
-                switchToResults()
-            else
+            if (resultsView.visible)
                 switchToMap()
+            else if (placeSearchModel.count > 1)
+                switchToResults()
         }
     }
 
@@ -310,8 +360,12 @@ ApplicationWindow {
                 map.fitViewportToGeoShape(QtPositioning.circle(map.homeCircle.center, map.homeCircle.radius))
             } else {
                 messageLabel.text = ""
-                if (directionsMode)
-                    map.fitViewportToGeoShape(QtPositioning.circle(map.markerStart.coordinate, 100))
+                if (directionsMode && routing.count > 0) {
+                    map.fitViewportToGeoShape(routing.get(0).bounds)
+                } else if (placeSearchModel.count > 0) {
+                    print("Fitting to a place")
+                    map.fitViewportToGeoShape(QtPositioning.circle(placeSearchModel.data(0, "place").location.coordinate, 100))
+                }
             }
         }
     }
@@ -650,5 +704,13 @@ ApplicationWindow {
         routeQuery.addWaypoint(start)
         print("Adding " + printCoords(destination) + " as destination")
         routeQuery.addWaypoint(destination)
+    }
+
+    function listCategories(categories) {
+        var result = []
+        for (var i = 0; i < categories.length; i++) {
+            result.push(categories[i].name)
+        }
+        return result.join(', ')
     }
 }

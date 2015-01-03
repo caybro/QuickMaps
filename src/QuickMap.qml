@@ -158,7 +158,7 @@ Map {
         anchors.margins: 5
         model: mapTypeModel
         textRole: "name"
-        z: parent.z + 2
+        z: parent.z + 1
         visible: parent.visible
         implicitWidth: 200
         onActivated: {
@@ -175,7 +175,7 @@ Map {
     Component.onCompleted: {
         var maps = map.supportedMapTypes;
         print("Supported map types: " + maps.length)
-        for (var i = 0; i < maps.length; i++){
+        for (var i = 0; i < maps.length; i++) {
             print(maps[i].name + " (" + maps[i].description + ")");
             print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
             if (mobile) {
