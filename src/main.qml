@@ -153,8 +153,6 @@ ApplicationWindow {
                             id: placeText
                             text: title
                             anchors.horizontalCenter: image.horizontalCenter
-                            visible: (placeSearchModel.count > 1 && map.zoomLevel > 12)
-                                     || (placeSearchModel.count == 1 && map.zoomLevel < 7)
                         }
                         Image {
                             id: image
@@ -180,12 +178,14 @@ ApplicationWindow {
                                 text: qsTr("&Details...")
                                 onTriggered: {
                                     print("Details for place (ID): " + place.name + " (" + place.placeId + ")")
+                                    place.getDetails()
 
                                     placeDetailsDlg.text = "<b>" + place.name + "</b><br><br>" +
                                             qsTr("Address: %1").arg(place.location.address.text.replace(/<br\/>/g, ", ")) + "<br>" +
                                             qsTr("Categories: %1").arg(listCategories(place.categories)) + "<br>" +
                                             qsTr("Rating: %L1 stars").arg(place.ratings.average)
-                                    placeDetailsDlg.informativeText = "<small>" + printCoords(place.location.coordinate) + "</small>"
+                                    placeDetailsDlg.informativeText = "<small>" + printCoords(place.location.coordinate) + "</small><br>" +
+                                            place.attribution
                                     placeDetailsDlg.open()
                                 }
                             }
@@ -262,7 +262,7 @@ ApplicationWindow {
 
     RouteQuery {
         id: routeQuery
-        travelModes: directionsGroup.current.featureType
+        travelModes: directionsGroup.current.travelMode
         routeOptimizations: fastestOptionItem.checked ? RouteQuery.FastestRoute : RouteQuery.ShortestRoute
         //numberAlternativeRoutes: 2
     }
@@ -363,7 +363,6 @@ ApplicationWindow {
                 if (directionsMode && routing.count > 0) {
                     map.fitViewportToGeoShape(routing.get(0).bounds)
                 } else if (placeSearchModel.count > 0) {
-                    print("Fitting to a place")
                     map.fitViewportToGeoShape(QtPositioning.circle(placeSearchModel.data(0, "place").location.coordinate, 100))
                 }
             }
@@ -383,6 +382,8 @@ ApplicationWindow {
                     carModeItem.trigger()
             } else {
                 routing.reset()
+                messageLabel.text = ""
+                map.switchMapType(-1, false /*night TODO */, mobile)
             }
         }
     }
@@ -517,7 +518,7 @@ ApplicationWindow {
                     anchors.fill: parent
                 }
             }
-            Item { Layout.preferredWidth: 10 }
+            Item { Layout.preferredWidth: 10; visible: !mobile }
             ToolButton {
                 action: fullscreenAction
                 visible: !mobile
@@ -536,7 +537,7 @@ ApplicationWindow {
             text: qsTr("Drive")
             iconSource: "qrc:/icons/ic_directions_car_24px.svg"
             exclusiveGroup: directionsGroup
-            property int featureType: RouteQuery.CarTravel
+            property int travelMode: RouteQuery.CarTravel
             onTriggered: {
                 directionsGroup.current = carModeItem
                 print("Go by car!!!")
@@ -548,7 +549,7 @@ ApplicationWindow {
             text: qsTr("Walk")
             iconSource: "qrc:/icons/ic_directions_walk_24px.svg"
             exclusiveGroup: directionsGroup
-            property int featureType: RouteQuery.PedestrianTravel
+            property int travelMode: RouteQuery.PedestrianTravel
             onTriggered: {
                 directionsGroup.current = pedestrianModeItem
                 print("Walk!!!")
@@ -560,7 +561,7 @@ ApplicationWindow {
             text: qsTr("Public Transport")
             iconSource: "qrc:/icons/ic_directions_transit_24px.svg"
             exclusiveGroup: directionsGroup
-            property int featureType: RouteQuery.PublicTransitTravel
+            property int travelMode: RouteQuery.PublicTransitTravel
             onTriggered: {
                 directionsGroup.current = transitModeItem
                 print("Transit!!!")
@@ -625,27 +626,6 @@ ApplicationWindow {
             onTriggered: routeQuery.setFeatureWeight(RouteQuery.FerryFeature,
                                                      featureFerry.checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
         }
-
-        //        MenuItem { // BUG those 2 options not supported by here.com
-        //            id: economicOptionItem
-        //            text: qsTr("Most &economic route")
-        //            checkable: true
-        //            exclusiveGroup: directionsOptionGroup
-        //            onTriggered: {
-        //                if (checked)
-        //                    routeQuery.routeOptimizations = RouteQuery.MostEconomicRoute
-        //            }
-        //        }
-        //        MenuItem {
-        //            id: scenicOptionItem
-        //            text: qsTr("Most s&cenic route")
-        //            checkable: true
-        //            exclusiveGroup: directionsOptionGroup
-        //            onTriggered: {
-        //                if (checked)
-        //                    routeQuery.routeOptimizations = RouteQuery.MostScenicRoute
-        //            }
-        //        }
     }
 
     statusBar: StatusBar {
@@ -697,13 +677,14 @@ ApplicationWindow {
     }
 
     function findDirections() {
-        // TODO find and switch to the appropriate map type
         routing.reset()
         routeQuery.clearWaypoints()
         print("Adding " + printCoords(start) + " as start")
         routeQuery.addWaypoint(start)
         print("Adding " + printCoords(destination) + " as destination")
         routeQuery.addWaypoint(destination)
+
+        map.switchMapType(routeQuery.travelModes, false /*night TODO */, mobile);
     }
 
     function listCategories(categories) {

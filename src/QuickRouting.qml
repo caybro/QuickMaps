@@ -60,7 +60,7 @@ RouteModel {
     }
 
     function printRoute(route) {
-        print("--- Route details ---")
+        print("\n\n--- Route details ---")
         for (var i = 0; i < route.segments.length; i++) {
             var segment = route.segments[i]
             print("Segment " + i + ": " + segment.distance + " meters")

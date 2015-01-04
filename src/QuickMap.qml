@@ -161,8 +161,8 @@ Map {
         z: parent.z + 1
         visible: parent.visible
         implicitWidth: 200
-        onActivated: {
-            map.activeMapType = model.get(index).data
+        onCurrentIndexChanged: {
+            map.activeMapType = model.get(currentIndex).data
             map.update()
         }
     }
@@ -178,6 +178,7 @@ Map {
         for (var i = 0; i < maps.length; i++) {
             print(maps[i].name + " (" + maps[i].description + ")");
             print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
+            print("\tStyle: " + maps[i].style)
             if (mobile) {
                 if (maps[i].mobile) {
                     mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
@@ -213,5 +214,31 @@ Map {
 
     function zoomOut() {
         zoomLevel -= 1
+    }
+
+    function switchMapType(travelMode, night, mobile) {
+        print("Travel mode: " + travelMode)
+        print("Night: " + night)
+        print("Mobile: " + mobile)
+
+        var style;
+        if (travelMode === RouteQuery.PedestrianTravel || travelMode === RouteQuery.BicycleTravel)
+            style = MapType.PedestrianMap;
+        else if (travelMode === RouteQuery.PublicTransitTravel)
+            style = MapType.TransitMap;
+        else if (travelMode === RouteQuery.CarTravel)
+            style = MapType.CarNavigationMap;
+        else
+            style = MapType.StreetMap;
+
+        for (var i = 0; i < mapTypeModel.count; i++) {
+            var aMap = mapTypeModel.get(i).data;
+            if (style === aMap.style && aMap.night === night && aMap.mobile === mobile) {
+                print("Found requested style " + style + " at index " + i);
+                print("Name: " + aMap.name)
+                mapTypeCombo.currentIndex = i
+                break
+            }
+        }
     }
 }
