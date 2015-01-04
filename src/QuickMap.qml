@@ -29,26 +29,6 @@ Map {
     property alias markerDestination: markerDestination
     property alias homeCircle: homeCircle
 
-    GeocodeModel {
-        id: geocodeModel
-        plugin: geocodePlugin
-        onStatusChanged: {
-            if (status == GeocodeModel.Ready) {
-                print("Got " + count + " reverse geocode results")
-                if (count > 0) {
-                    var address = get(0).address.text.replace(/<br\/>/g, ", ")
-                    print("Here's address: " + address)
-                    if (currentSearchField == "start")
-                        input.text = address
-                    else if (currentSearchField == "destination")
-                        inputDestination.text = address
-                    else
-                        messageLabel.text = address
-                }
-            }
-        }
-    }
-
     MouseArea {
         id: mapMouseArea
         anchors.fill: parent

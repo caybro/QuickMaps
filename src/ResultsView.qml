@@ -49,13 +49,16 @@ ScrollView {
         
         function selectPlace(index) {
             var currentPlace = model.data(currentIndex, "place").location
+            var address = currentPlace.address.text.replace(/<br\/>/g, ", ")
             print("Selecting " + currentPlace.address.text + " as " + currentSearchField)
             messageLabel.text = model.data(currentIndex, "title") + " (" + currentPlace.address.text.replace(/<br\/>/g, ", ") + ")"
 
             if (currentSearchField == "start") {
                 start = makeCoords(currentPlace)
+                input.text = address
             } else if (currentSearchField == "destination") {
                 destination = makeCoords(currentPlace)
+                inputDestination.text = address
             }
 
             if (currentPlace.boundingBox.isValid)

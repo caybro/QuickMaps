@@ -216,6 +216,25 @@ ApplicationWindow {
         }
     }
 
+    GeocodeModel {
+        id: geocodeModel
+        plugin: geocodePlugin
+        onStatusChanged: {
+            if (status == GeocodeModel.Ready) {
+                print("Got " + count + " reverse geocode results")
+                if (count > 0) {
+                    selectPlace(get(0))
+
+                    if (directionsMode) {
+                        findDirections()
+                    }
+                }
+            } else if (status == GeocodeModel.Error) {
+                print("Geocode error: " + errorString())
+            }
+        }
+    }
+
     PlaceSearchModel {
         id: placeSearchModel
         plugin: plugin
@@ -227,20 +246,7 @@ ApplicationWindow {
                 searchTerm = ""
                 print ("Got " + count + " place search results")
                 if (count == 1) {
-                    var currentPlace = data(0, "place").location
-
-                    if (currentSearchField == "start")
-                        start = makeCoords(currentPlace)
-                    else if (currentSearchField == "destination")
-                        destination = makeCoords(currentPlace)
-
-                    messageLabel.text = data(0, "title") + " (" + currentPlace.address.text.replace(/<br\/>/g, ", ") + ")"
-
-                    if (currentPlace.boundingBox.isValid)
-                        map.fitViewportToGeoShape(currentPlace.boundingBox)
-                    else
-                        map.fitViewportToGeoShape(QtPositioning.circle(makeCoords(currentPlace), 100))
-                    switchToMap()
+                    selectPlace(data(0, "place").location)
                 } else if (count > 1) {
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
                     switchToResults()
@@ -248,8 +254,12 @@ ApplicationWindow {
                     print ("Got no results from " + currentSearchField)
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
                 }
+
+                if (count > 0 && directionsMode) {
+                    findDirections()
+                }
             } else if (status == PlaceSearchModel.Error) {
-                print("Places Search error: " + errorString())
+                print("Places search error: " + errorString())
             }
         }
     }
@@ -326,8 +336,13 @@ ApplicationWindow {
         onTriggered: {
             var text = currentSearchField == "destination" ? inputDestination.text : input.text
             print("Current query: " + text + " (searching for " + currentSearchField + ")")
-            placeSearchModel.searchTerm = text
-            placeSearchModel.update()
+            if (directionsMode) {
+                geocodeModel.query = text
+                geocodeModel.update()
+            } else {
+                placeSearchModel.searchTerm = text
+                placeSearchModel.update()
+            }
         }
     }
 
@@ -378,8 +393,6 @@ ApplicationWindow {
         onCheckedChanged: {
             if (checked) {
                 placeSearchModel.reset()
-                if (start.isValid && destination.isValid)
-                    carModeItem.trigger()
             } else {
                 routing.reset()
                 messageLabel.text = ""
@@ -420,7 +433,8 @@ ApplicationWindow {
                     }
                 }
                 onTextChanged: {
-                    goAction.enabled = text != "" && placeSearchModel.status != PlaceSearchModel.Loading
+                    goAction.enabled = text != "" &&
+                            (placeSearchModel.status != PlaceSearchModel.Loading || geocodeModel.status != GeocodeModel.Loading)
                 }
                 Image {
                     anchors.right: parent.right
@@ -436,7 +450,8 @@ ApplicationWindow {
                              && currentSearchField == "start" && placeSearchModel.status == PlaceSearchModel.Ready
                 }
                 BusyIndicator {
-                    running: placeSearchModel.status == PlaceSearchModel.Loading && currentSearchField != "destination"
+                    running: (placeSearchModel.status == PlaceSearchModel.Loading || geocodeModel.status == GeocodeModel.Loading)
+                             && currentSearchField != "destination"
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     height: parent.childrenRect.height - 5
@@ -466,15 +481,14 @@ ApplicationWindow {
                 visible: directionsMode
                 onAccepted: {
                     if (text != "") {
-                        if (directionsMode) {
-                            destination = QtPositioning.coordinate()
-                            currentSearchField = "destination"
-                        }
+                        destination = QtPositioning.coordinate()
+                        currentSearchField = "destination"
                         goAction.trigger()
                     }
                 }
                 onTextChanged: {
-                    goAction.enabled = text != "" && placeSearchModel.status != PlaceSearchModel.Loading
+                    goAction.enabled = text != "" &&
+                            (placeSearchModel.status != PlaceSearchModel.Loading || geocodeModel.status != GeocodeModel.Loading)
                 }
                 Image {
                     anchors.right: parent.right
@@ -490,7 +504,8 @@ ApplicationWindow {
                              currentSearchField == "destination" && placeSearchModel.status == PlaceSearchModel.Ready
                 }
                 BusyIndicator {
-                    running: placeSearchModel.status == PlaceSearchModel.Loading && currentSearchField == "destination"
+                    running: (placeSearchModel.status == PlaceSearchModel.Loading  || geocodeModel.status == GeocodeModel.Loading)
+                             && currentSearchField == "destination"
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     height: parent.childrenRect.height - 5
@@ -624,7 +639,7 @@ ApplicationWindow {
             checkable: true
             checked: true
             onTriggered: routeQuery.setFeatureWeight(RouteQuery.FerryFeature,
-                                                     featureFerry.checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
+                                                     checked ? RouteQuery.NeutralFeatureWeight : RouteQuery.AvoidFeatureWeight)
         }
     }
 
@@ -677,6 +692,11 @@ ApplicationWindow {
     }
 
     function findDirections() {
+        if (!start.isValid || !destination.isValid) {
+            print("Invalid start/destination, aborting directions")
+            return
+        }
+
         routing.reset()
         routeQuery.clearWaypoints()
         print("Adding " + printCoords(start) + " as start")
@@ -693,5 +713,25 @@ ApplicationWindow {
             result.push(categories[i].name)
         }
         return result.join(', ')
+    }
+
+    function selectPlace(location) {
+        var address = location.address.text.replace(/<br\/>/g, ", ")
+
+        if (currentSearchField == "start") {
+            start = makeCoords(location)
+            input.text = address
+        } else if (currentSearchField == "destination") {
+            destination = makeCoords(location)
+            inputDestination.text = address
+        } else {
+            messageLabel.text = address
+        }
+
+        if (location.boundingBox.isValid)
+            map.fitViewportToGeoShape(location.boundingBox)
+        else
+            map.fitViewportToGeoShape(QtPositioning.circle(makeCoords(location), 100))
+        switchToMap()
     }
 }
