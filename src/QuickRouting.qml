@@ -41,22 +41,22 @@ RouteModel {
     }
 
     function formatSeconds(seconds) {
-        var numdays = Math.floor((seconds % 31536000) / 86400);
-        var numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
-        var numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
-        var numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
+        var numdays = Math.floor((seconds % 31536000) / 86400)
+        var numhours = Math.floor(((seconds % 31536000) % 86400) / 3600)
+        var numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60)
+        var numseconds = (((seconds % 31536000) % 86400) % 3600) % 60
 
-        var result = "";
+        var result = ""
         if (numdays > 0)
-            result += qsTranslate("", "%n day(s)", "", numdays) + ", ";
+            result += qsTranslate("", "%n day(s)", "", numdays) + ", "
         if (numhours > 0)
-            result += qsTranslate("", "%n hour(s)", "", numhours) + ", ";
+            result += qsTranslate("", "%n hour(s)", "", numhours) + ", "
         if (numminutes > 0)
-            result += qsTranslate("", "%n minute(s)", "", numminutes) + ", ";
+            result += qsTranslate("", "%n minute(s)", "", numminutes) + ", "
         if (numseconds > 0)
-            result += qsTranslate("", "%n second(s)", "", numseconds);
+            result += qsTranslate("", "%n second(s)", "", numseconds)
 
-        return result;
+        return result
     }
 
     function printRoute(route) {

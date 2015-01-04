@@ -31,7 +31,8 @@ ScrollView {
     }
 
     onWidthChanged: {
-        if (width == 0) visible = false;
+        if (width == 0)
+            visible = false
     }
 
     ListView {
@@ -105,7 +106,7 @@ ScrollView {
                 }
                 Text {
                     id: locationDelegate
-                    text: place.location.address.text;
+                    text: place.location.address.text
                 }
                 Text {
                     text: printCoords(place.location.coordinate)
@@ -144,7 +145,7 @@ ScrollView {
         }
         
         Component.onCompleted: {
-            currentIndex = 0;
+            currentIndex = 0
         }
     }
 }

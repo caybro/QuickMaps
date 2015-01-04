@@ -84,7 +84,7 @@ Map {
                     //print("Coord: " + map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY)))
                     currentSearchField = ""
                     geocodeModel.query = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
-                    geocodeModel.update();
+                    geocodeModel.update()
                 }
             }
             MenuItem {
@@ -95,7 +95,7 @@ Map {
                     start = here
                     currentSearchField = "start"
                     geocodeModel.query = here
-                    geocodeModel.update();
+                    geocodeModel.update()
                 }
             }
             MenuItem {
@@ -106,7 +106,7 @@ Map {
                     destination = here
                     currentSearchField = "destination"
                     geocodeModel.query = here
-                    geocodeModel.update();
+                    geocodeModel.update()
                 }
             }
         }
@@ -173,18 +173,18 @@ Map {
     }
     
     Component.onCompleted: {
-        var maps = map.supportedMapTypes;
+        var maps = map.supportedMapTypes
         print("Supported map types: " + maps.length)
         for (var i = 0; i < maps.length; i++) {
-            print(maps[i].name + " (" + maps[i].description + ")");
+            print(maps[i].name + " (" + maps[i].description + ")")
             print("\tNight mode: " + maps[i].night + ", mobile: " + maps[i].mobile)
             print("\tStyle: " + maps[i].style)
             if (mobile) {
                 if (maps[i].mobile) {
-                    mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
+                    mapTypeModel.append({"name": maps[i].name, "data": maps[i]})
                 }
             } else {
-                mapTypeModel.append({"name": maps[i].name, "data": maps[i]});
+                mapTypeModel.append({"name": maps[i].name, "data": maps[i]})
             }
         }
 
@@ -221,20 +221,20 @@ Map {
         print("Night: " + night)
         print("Mobile: " + mobile)
 
-        var style;
+        var style
         if (travelMode === RouteQuery.PedestrianTravel || travelMode === RouteQuery.BicycleTravel)
-            style = MapType.PedestrianMap;
+            style = MapType.PedestrianMap
         else if (travelMode === RouteQuery.PublicTransitTravel)
-            style = MapType.TransitMap;
+            style = MapType.TransitMap
         else if (travelMode === RouteQuery.CarTravel)
-            style = MapType.CarNavigationMap;
+            style = MapType.CarNavigationMap
         else
-            style = MapType.StreetMap;
+            style = MapType.StreetMap
 
         for (var i = 0; i < mapTypeModel.count; i++) {
-            var aMap = mapTypeModel.get(i).data;
+            var aMap = mapTypeModel.get(i).data
             if (style === aMap.style && aMap.night === night && aMap.mobile === mobile) {
-                print("Found requested style " + style + " at index " + i);
+                print("Found requested style " + style + " at index " + i)
                 print("Name: " + aMap.name)
                 mapTypeCombo.currentIndex = i
                 break

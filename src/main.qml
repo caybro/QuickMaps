@@ -36,8 +36,8 @@ ApplicationWindow {
     property int windowVisibility
 
     property bool mobile: ["android", "ios", "blackberry", "wince"].some(function(element) {
-        return element === Qt.platform.os;
-    });
+        return element === Qt.platform.os
+    })
 
     property string currentSearchField // "start" or "destination"
     property bool directionsMode: goNavigateAction.checked
@@ -61,7 +61,7 @@ ApplicationWindow {
     Component.onCompleted: {
         print("App name/version: " + Qt.application.name + " " + Qt.application.version)
         print("Platform: " + Qt.platform.os)
-        print("Mobile: " + mobile);
+        print("Mobile: " + mobile)
         print("Available services: " + plugin.availableServiceProviders)
         print("Actual mapping plugin: " + plugin.name)
         print("Min/max zooms: " + map.minimumZoomLevel + "/" + map.maximumZoomLevel)
@@ -313,7 +313,7 @@ ApplicationWindow {
         tooltip: qsTr("Exit Application") + " (" + shortcut + ")"
         iconName: "application-exit"
         shortcut: StandardKey.Quit
-        onTriggered: Qt.quit();
+        onTriggered: Qt.quit()
     }
 
     Action {
@@ -325,7 +325,7 @@ ApplicationWindow {
         enabled: false
         onTriggered: {
             var text = currentSearchField == "destination" ? inputDestination.text : input.text
-            print("Current query: " + text + " (searching for " + currentSearchField + ")");
+            print("Current query: " + text + " (searching for " + currentSearchField + ")")
             placeSearchModel.searchTerm = text
             placeSearchModel.update()
         }
@@ -450,12 +450,12 @@ ApplicationWindow {
                 tooltip: qsTr("Swap Start and Destination")
                 enabled: start.isValid || destination.isValid
                 onClicked: {
-                    var tmpLoc = start;
-                    start = destination;
-                    destination = tmpLoc;
-                    var tmpText = input.text;
-                    input.text = inputDestination.text;
-                    inputDestination.text = tmpText;
+                    var tmpLoc = start
+                    start = destination
+                    destination = tmpLoc
+                    var tmpText = input.text
+                    input.text = inputDestination.text
+                    inputDestination.text = tmpText
                 }
             }
 
@@ -684,7 +684,7 @@ ApplicationWindow {
         print("Adding " + printCoords(destination) + " as destination")
         routeQuery.addWaypoint(destination)
 
-        map.switchMapType(routeQuery.travelModes, false /*night TODO */, mobile);
+        map.switchMapType(routeQuery.travelModes, false /*night TODO */, mobile)
     }
 
     function listCategories(categories) {
