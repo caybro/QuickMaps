@@ -195,7 +195,7 @@ ApplicationWindow {
                                 enabled: place.location
                                 onTriggered: {
                                     destination = makeCoords(place.location)
-                                    inputDestination.text = place.location.address.text.replace(/<br\/>/g, ", ")
+                                    inputDestination.text = place.name + ", " + place.location.address.text.replace(/<br\/>/g, ", ")
                                     start = QtPositioning.coordinate()
                                     input.text = ""
                                     input.forceActiveFocus()
