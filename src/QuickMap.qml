@@ -217,8 +217,10 @@ Map {
                 print("Found requested style " + style + " at index " + i)
                 print("Name: " + aMap.name)
                 mapTypeCombo.currentIndex = i
-                break
+                return
             }
         }
+        print("Requested map style not found, trying w/o night and mobile!")
+        switchMapType(travelMode, false, false)
     }
 }
