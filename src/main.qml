@@ -41,7 +41,7 @@ ApplicationWindow {
     })
 
     property string currentSearchField // "start" or "destination"
-    property bool directionsMode: goNavigateAction.checked
+    property bool directionsMode: directionsAction.checked
     property var start: QtPositioning.coordinate()
     property var destination: QtPositioning.coordinate()
 
@@ -215,7 +215,7 @@ ApplicationWindow {
                                     start = QtPositioning.coordinate()
                                     input.text = ""
                                     input.forceActiveFocus()
-                                    goNavigateAction.checked = true
+                                    directionsAction.checked = true
                                 }
                             }
                         }
@@ -401,7 +401,7 @@ ApplicationWindow {
     }
 
     Action {
-        id: goNavigateAction
+        id: directionsAction
         text: qsTr("Directions")
         iconSource: "qrc:/icons/ic_directions_24px.svg"
         shortcut: "Ctrl+N"
@@ -540,7 +540,7 @@ ApplicationWindow {
             }
             ToolButton {
                 id: directionsButton
-                action: goNavigateAction
+                action: directionsAction
             }
             ToolButton {
                 id: directionsModeButton

@@ -70,7 +70,7 @@ Map {
             MenuItem {
                 text: qsTr("Directions from this place")
                 onTriggered: {
-                    goNavigateAction.checked = true
+                    directionsAction.checked = true
                     var here = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
                     start = here
                     currentSearchField = "start"
@@ -81,7 +81,7 @@ Map {
             MenuItem {
                 text: qsTr("Directions to this place")
                 onTriggered: {
-                    goNavigateAction.checked = true
+                    directionsAction.checked = true
                     var here = map.toCoordinate(Qt.point(mapMouseArea.mouseX, mapMouseArea.mouseY))
                     destination = here
                     currentSearchField = "destination"
