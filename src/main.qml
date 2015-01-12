@@ -393,6 +393,8 @@ ApplicationWindow {
         onCheckedChanged: {
             if (checked) {
                 placeSearchModel.reset()
+                if (start.isValid && destination.isValid)
+                    routing.update()
             } else {
                 routing.reset()
                 messageLabel.text = ""
