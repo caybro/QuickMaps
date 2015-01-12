@@ -23,6 +23,7 @@ import QtQuick.Dialogs 1.1
 import QtLocation 5.3
 import QtPositioning 5.2
 import Qt.labs.settings 1.0
+import QtSensors 5.1
 
 import "qrc:/"
 
@@ -84,7 +85,22 @@ ApplicationWindow {
         print("Supports reverse geocoding: " + geocodePlugin.supportsGeocoding(Plugin.ReverseGeocodingFeature))
         print("Supports places: " + geocodePlugin.supportsPlaces(Plugin.OnlinePlacesFeature))
 
+        var types = QmlSensors.sensorTypes();
+        print("Supported sensors: " + types.join(", "));
+        print("Light sensor: " + lightSensor.identifier + " " + lightSensor.description)
+        if (mobile) {
+            lightSensor.start()
+        }
+
         map.forceActiveFocus()
+    }
+
+    AmbientLightSensor {
+        id: lightSensor
+        skipDuplicates: true
+        onReadingChanged: {
+            print("Ambient light level: " + reading.lightLevel)
+        }
     }
 
     SystemPalette {
@@ -740,8 +756,12 @@ ApplicationWindow {
     }
 
     function isNight() {
-        var date = new Date()
-        var hour = date.getHours()
-        return (hour < 7 && hour > 18)
+        if (mobile) {
+            return lightSensor.reading.lightLevel === AmbientLightReading.Dark || lightSensor.reading.lightLevel === AmbientLightReading.Twilight
+        } else {
+            var date = new Date()
+            var hour = date.getHours()
+            return (hour < 7 || hour >= 17)
+        }
     }
 }
