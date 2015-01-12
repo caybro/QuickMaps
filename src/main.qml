@@ -393,12 +393,14 @@ ApplicationWindow {
         onCheckedChanged: {
             if (checked) {
                 placeSearchModel.reset()
-                if (start.isValid && destination.isValid)
+                if (start.isValid && destination.isValid) {
                     routing.update()
+                    map.switchMapType(routeQuery.travelModes, isNight(), mobile)
+                }
             } else {
                 routing.reset()
                 messageLabel.text = ""
-                map.switchMapType(-1, false /*night TODO */, mobile)
+                map.switchMapType(-1, false, mobile)
             }
         }
     }
@@ -706,7 +708,7 @@ ApplicationWindow {
         print("Adding " + printCoords(destination) + " as destination")
         routeQuery.addWaypoint(destination)
 
-        map.switchMapType(routeQuery.travelModes, false /*night TODO */, mobile)
+        map.switchMapType(routeQuery.travelModes, isNight(), mobile)
     }
 
     function listCategories(categories) {
@@ -735,5 +737,11 @@ ApplicationWindow {
         else
             map.fitViewportToGeoShape(QtPositioning.circle(makeCoords(location), 100))
         switchToMap()
+    }
+
+    function isNight() {
+        var date = new Date()
+        var hour = date.getHours()
+        return (hour < 7 && hour > 18)
     }
 }
