@@ -491,6 +491,8 @@ ApplicationWindow {
                     var tmpText = input.text
                     input.text = inputDestination.text
                     inputDestination.text = tmpText
+                    if (start.isValid && destination.isValid)
+                        routing.update()
                 }
             }
 
@@ -575,7 +577,7 @@ ApplicationWindow {
             property int travelMode: RouteQuery.CarTravel
             onTriggered: {
                 directionsGroup.current = carModeItem
-                print("Go by car!!!")
+                print("Drive!!!")
                 findDirections()
             }
         }
