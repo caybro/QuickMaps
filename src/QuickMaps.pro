@@ -24,5 +24,5 @@ include(deployment.pri)
 HEADERS += \
     geolocation.h
 
-VERSION = 0.2
+VERSION = 0.3
 DEFINES     += VERSION_NUMBER=\\\"$${VERSION}\\\"
