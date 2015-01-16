@@ -522,8 +522,8 @@ ApplicationWindow {
                     anchors.right: parent.right
                     anchors.margins: 3
                     source: "qrc:/icons/ic_warning_24px.svg"
-                    visible: input.text != "" && placeSearchModel.count == 0 &&
-                             currentSearchField == "destination" && placeSearchModel.status == PlaceSearchModel.Ready
+                    visible: input.text != "" && geocodeModel.count == 0 &&
+                             currentSearchField == "destination" && geocodeModel.status == GeocodeModel.Ready
                 }
                 BusyIndicator {
                     running: (placeSearchModel.status == PlaceSearchModel.Loading  || geocodeModel.status == GeocodeModel.Loading)
