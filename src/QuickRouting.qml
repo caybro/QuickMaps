@@ -27,7 +27,7 @@ RouteModel {
                 var route = get(0)
                 map.fitViewportToGeoShape(route.bounds)
                 print("Route measures " + route.distance + " meters and will take " + route.travelTime + " seconds")
-                messageLabel.text = qsTr("Route measures %1 kilometers and will take %2.").arg(formatMeters(route.distance)).arg(formatSeconds(route.travelTime))
+                messageLabel.text = qsTr("Route measures %1 and will take %2.").arg(formatMeters(route.distance)).arg(formatSeconds(route.travelTime))
                 printRoute(route)
             }
         } else if (status == RouteModel.Error) {
@@ -37,7 +37,7 @@ RouteModel {
     }
 
     function formatMeters(meters) {
-        return Number(meters / 1000).toLocaleString(Qt.locale(), "f")
+        return qsTranslate("", "%n kilometer(s)", "", meters/1000)
     }
 
     function formatSeconds(seconds) {

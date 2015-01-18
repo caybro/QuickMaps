@@ -183,7 +183,7 @@ ApplicationWindow {
                         acceptedButtons: Qt.LeftButton
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            print("Clicked place ID: " + place.placeId)
+                            //print("Clicked place ID: " + place.placeId)
                             messageLabel.text = place.name + " (" + place.location.address.text.replace(/<br\/>/g, ", ") + ")"
                             placeMenu.popup()
                         }
@@ -194,7 +194,6 @@ ApplicationWindow {
                                 text: qsTr("&Details...")
                                 onTriggered: {
                                     print("Details for place (ID): " + place.name + " (" + place.placeId + ")")
-                                    place.getDetails()
 
                                     placeDetailsDlg.text = "<b>" + place.name + "</b><br><br>" +
                                             qsTr("Address: %1").arg(place.location.address.text.replace(/<br\/>/g, ", ")) + "<br>" +

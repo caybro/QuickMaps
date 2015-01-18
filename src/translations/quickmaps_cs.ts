@@ -4,6 +4,15 @@
 <context>
     <name></name>
     <message numerus="yes">
+        <location filename="../QuickRouting.qml" line="40"/>
+        <source>%n kilometer(s)</source>
+        <translation>
+            <numerusform>1 kilometr</numerusform>
+            <numerusform>%n kilometry</numerusform>
+            <numerusform>%n kilometrů</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
         <location filename="../QuickRouting.qml" line="50"/>
         <source>%n day(s)</source>
         <translation>
@@ -78,9 +87,13 @@
 <context>
     <name>QuickRouting</name>
     <message>
-        <location filename="../QuickRouting.qml" line="30"/>
         <source>Route measures %1 kilometers and will take %2.</source>
-        <translation>Cesta měří %1 kilometrů a zabere %2.</translation>
+        <translation type="vanished">Cesta měří %1 kilometrů a zabere %2.</translation>
+    </message>
+    <message>
+        <location filename="../QuickRouting.qml" line="30"/>
+        <source>Route measures %1 and will take %2.</source>
+        <translation>Cesta měří %1 a zabere %2.</translation>
     </message>
     <message>
         <location filename="../QuickRouting.qml" line="35"/>
@@ -109,137 +122,137 @@
         <translation>&amp;Detaily...</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="200"/>
+        <location filename="../main.qml" line="199"/>
         <source>Address: %1</source>
         <translation>Adresa: %1</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="201"/>
+        <location filename="../main.qml" line="200"/>
         <source>Categories: %1</source>
         <translation>Kategorie: %1</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="202"/>
+        <location filename="../main.qml" line="201"/>
         <source>Rating: %L1 stars</source>
         <translation>Hodnocení: %L1 hvězdiček</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="209"/>
+        <location filename="../main.qml" line="208"/>
         <source>Directions &amp;here</source>
         <translation>Pokyny &amp;sem</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="311"/>
+        <location filename="../main.qml" line="310"/>
         <source>Zoom Out</source>
         <translation>Oddálit</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="326"/>
+        <location filename="../main.qml" line="325"/>
         <source>Zoom In</source>
         <translation>Přiblížit</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="338"/>
+        <location filename="../main.qml" line="337"/>
         <source>&amp;Quit</source>
         <translation>U&amp;končit</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="339"/>
+        <location filename="../main.qml" line="338"/>
         <source>Exit Application</source>
         <translation>Ukončit aplikaci</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="347"/>
+        <location filename="../main.qml" line="346"/>
         <source>&amp;Find</source>
         <translation>Na&amp;jít</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="382"/>
+        <location filename="../main.qml" line="381"/>
         <source>My Location</source>
         <translation>Moje umístění</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="383"/>
+        <location filename="../main.qml" line="382"/>
         <source>Display my location on the map</source>
         <translation>Zobrazit mé umístění na mapě</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="405"/>
+        <location filename="../main.qml" line="404"/>
         <source>Directions</source>
         <translation>Pokyny</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="447"/>
+        <location filename="../main.qml" line="446"/>
         <source>Start</source>
         <translation>Začátek</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="447"/>
+        <location filename="../main.qml" line="446"/>
         <source>Search for places, addresses and locations</source>
         <translation>Hledat místa, adresy a body zájmu</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="484"/>
+        <location filename="../main.qml" line="483"/>
         <source>Swap</source>
         <translation>Prohodit</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="485"/>
+        <location filename="../main.qml" line="484"/>
         <source>Swap Start and Destination</source>
         <translation>Prohodit start a cíl</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="502"/>
+        <location filename="../main.qml" line="501"/>
         <source>Destination</source>
         <translation>Cíl</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="574"/>
+        <location filename="../main.qml" line="573"/>
         <source>Drive</source>
         <translation>Jet autem</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="586"/>
+        <location filename="../main.qml" line="585"/>
         <source>Walk</source>
         <translation>Jít pěšky</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="598"/>
+        <location filename="../main.qml" line="597"/>
         <source>Public Transport</source>
         <translation>Veřejná doprava</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="614"/>
+        <location filename="../main.qml" line="613"/>
         <source>&amp;Fastest route</source>
         <translation>&amp;Nejrychlejší cesta</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="621"/>
+        <location filename="../main.qml" line="620"/>
         <source>&amp;Shortest route</source>
         <translation>Nejkratší ce&amp;sta</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="628"/>
+        <location filename="../main.qml" line="627"/>
         <source>Toll roads</source>
         <translation>Placené úseky</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="636"/>
+        <location filename="../main.qml" line="635"/>
         <source>Highways</source>
         <translation>Dálnice</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="644"/>
+        <location filename="../main.qml" line="643"/>
         <source>Tunnels</source>
         <translation>Tunely</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="652"/>
+        <location filename="../main.qml" line="651"/>
         <source>Unpaved roads</source>
         <translation>Nezpevněné cesty</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="660"/>
+        <location filename="../main.qml" line="659"/>
         <source>Ferries</source>
         <translation>Trajekty</translation>
     </message>
@@ -248,7 +261,7 @@
         <translation type="vanished">Pře&amp;jít</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="367"/>
+        <location filename="../main.qml" line="366"/>
         <source>&amp;Back</source>
         <translation>&amp;Zpět</translation>
     </message>
@@ -261,7 +274,7 @@
         <translation type="vanished">&amp;Domů</translation>
     </message>
     <message>
-        <location filename="../main.qml" line="426"/>
+        <location filename="../main.qml" line="425"/>
         <source>View &amp;Fullscreen</source>
         <translation>Zobrazit na &amp;celou obrazovku</translation>
     </message>
@@ -270,8 +283,8 @@
         <translation type="vanished">Dotaz:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../main.qml" line="267"/>
-        <location filename="../main.qml" line="271"/>
+        <location filename="../main.qml" line="266"/>
+        <location filename="../main.qml" line="270"/>
         <source>Query returned %n item(s)</source>
         <translation>
             <numerusform>Dotaz vrátil 1 položku</numerusform>
