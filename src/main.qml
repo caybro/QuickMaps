@@ -45,6 +45,17 @@ ApplicationWindow {
     property var start: QtPositioning.coordinate()
     property var destination: QtPositioning.coordinate()
 
+    PositionSource {
+        id: src
+        updateInterval: 1000
+        active: true
+
+        onPositionChanged: {
+            var coord = src.position.coordinate;
+            console.log("Coordinate:", coord.longitude, coord.latitude);
+        }
+    }
+
     Settings {
         id: settings
         // save window size and position
@@ -380,13 +391,13 @@ ApplicationWindow {
         id: goHomeAction
         text: qsTr("My Location")
         tooltip: qsTr("Display my location on the map") + " (" + shortcut + ")"
-        iconSource: GeoLocation.isValid ? "qrc:/icons/ic_my_location_24px.svg" : "qrc:/icons/ic_location_searching_24px.svg"
+        iconSource: src.position.coordinate.isValid ? "qrc:/icons/ic_my_location_24px.svg" : "qrc:/icons/ic_location_searching_24px.svg"
         shortcut: "Ctrl+Home"
-        enabled: GeoLocation.isValid
+        enabled: src.position.coordinate.isValid
         checkable: true
         onTriggered: {
             if (checked) {
-                messageLabel.text = GeoLocation.description
+                //messageLabel.text = GeoLocation.description
                 map.fitViewportToGeoShape(QtPositioning.circle(map.homeCircle.center, map.homeCircle.radius))
             } else {
                 messageLabel.text = ""

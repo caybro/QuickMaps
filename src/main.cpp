@@ -24,8 +24,6 @@
 #include <QCommandLineParser>
 #include <QDebug>
 
-#include "geolocation.h"
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -51,13 +49,9 @@ int main(int argc, char *argv[])
                                         "longitude"));
     parser.process(app);
 
-    GeoLocation * loc = new GeoLocation(qApp);
-
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("initialLatitude", parser.isSet("latitude") ? parser.value("latitude").toDouble() : 49.6843842);
     engine.rootContext()->setContextProperty("initialLongitude", parser.isSet("longitude") ? parser.value("longitude").toDouble() : 17.2190358);
-    engine.rootContext()->setContextProperty("GeoLocation", loc);
-
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();

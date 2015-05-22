@@ -122,8 +122,8 @@ Map {
         id: homeCircle
         color: palette.highlight
         opacity: 0.4
-        center: QtPositioning.coordinate(GeoLocation.latitude, GeoLocation.longitude)
-        radius: GeoLocation.accuracy
+        center: src.position.coordinate
+        radius: src.position.horizontalAccuracy
         visible: goHomeAction.checked
     }
 

@@ -4,8 +4,7 @@ CONFIG += c++11
 
 QT += qml quick widgets dbus
 
-SOURCES += main.cpp \
-    geolocation.cpp
+SOURCES += main.cpp
 
 lupdate_only{
 SOURCES += main.qml ResultsView.qml QuickMap.qml QuickRouting.qml
@@ -21,8 +20,7 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-HEADERS += \
-    geolocation.h
+HEADERS +=
 
 VERSION = 0.3
 DEFINES     += VERSION_NUMBER=\\\"$${VERSION}\\\"
