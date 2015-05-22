@@ -36,7 +36,7 @@ ApplicationWindow {
 
     property int windowVisibility
 
-    property bool mobile: ["android", "ios", "blackberry", "wince"].some(function(element) {
+    readonly property bool mobile: ["android", "ios", "blackberry", "wince"].some(function(element) {
         return element === Qt.platform.os
     })
 
