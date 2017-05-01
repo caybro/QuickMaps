@@ -16,10 +16,10 @@
 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.2
-import QtQuick.Layouts 1.1
+import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.3
 import QtLocation 5.3
-import QtPositioning 5.2
+import QtPositioning 5.3
 
 Map {
     id: map
@@ -28,6 +28,8 @@ Map {
     property alias markerStart: markerStart
     property alias markerDestination: markerDestination
     property alias homeCircle: homeCircle
+
+    onCopyrightLinkActivated: Qt.openUrlExternally(link)
 
     MouseArea {
         id: mapMouseArea
@@ -189,11 +191,11 @@ Map {
     }
 
     function zoomIn() {
-        zoomLevel += 1
+        zoomLevel = Math.ceil(zoomLevel + 1)
     }
 
     function zoomOut() {
-        zoomLevel -= 1
+        zoomLevel = Math.floor(zoomLevel - 1)
     }
 
     function switchMapType(travelMode, night, mobile) {

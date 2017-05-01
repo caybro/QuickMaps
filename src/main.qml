@@ -16,14 +16,14 @@
 */
 
 import QtQuick 2.4
-import QtQuick.Controls 1.2
-import QtQuick.Layouts 1.1
+import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.3
 import QtQuick.Window 2.2
-import QtQuick.Dialogs 1.1
-import QtLocation 5.3
-import QtPositioning 5.2
+import QtQuick.Dialogs 1.2
+import QtLocation 5.5
+import QtPositioning 5.3
 import Qt.labs.settings 1.0
-import QtSensors 5.1
+import QtSensors 5.3
 
 import "qrc:/"
 
@@ -387,13 +387,13 @@ ApplicationWindow {
         onTriggered: {
             if (checked) {
                 messageLabel.text = GeoLocation.description
-                map.fitViewportToGeoShape(QtPositioning.circle(map.homeCircle.center, map.homeCircle.radius))
+                map.visibleRegion = QtPositioning.circle(map.homeCircle.center, map.homeCircle.radius)
             } else {
                 messageLabel.text = ""
                 if (directionsMode && routing.count > 0) {
-                    map.fitViewportToGeoShape(routing.get(0).bounds)
+                    map.visibleRegion = routing.get(0).bounds
                 } else if (placeSearchModel.count > 0) {
-                    map.fitViewportToGeoShape(QtPositioning.circle(placeSearchModel.data(0, "place").location.coordinate, 100))
+                    map.visibleRegion = QtPositioning.circle(placeSearchModel.data(0, "place").location.coordinate, 100)
                 }
             }
         }
@@ -425,7 +425,7 @@ ApplicationWindow {
         text: qsTr("View &Fullscreen")
         tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconSource: checked ? "qrc:/icons/ic_fullscreen_exit_24px.svg" : "qrc:/icons/ic_fullscreen_24px.svg"
-        shortcut: "F11"
+        shortcut: StandardKey.FullScreen
         checkable: true
         checked: mainWindow.visibility == Window.FullScreen
         onTriggered: toggleFullscreen()
@@ -750,9 +750,9 @@ ApplicationWindow {
         }
 
         if (location.boundingBox.isValid)
-            map.fitViewportToGeoShape(location.boundingBox)
+            map.visibleRegion = location.boundingBox
         else
-            map.fitViewportToGeoShape(QtPositioning.circle(makeCoords(location), 100))
+            map.visibleRegion = QtPositioning.circle(makeCoords(location), 100)
         switchToMap()
     }
 

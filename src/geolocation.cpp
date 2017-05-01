@@ -54,7 +54,7 @@ void GeoLocation::init()
     QDBusReply<QDBusObjectPath> clientPath = m_masterIface.asyncCall("GetClient");
     if (clientPath.isValid()) {
         const QString path = clientPath.value().path();
-        //qDebug() << "Got client path" << path;
+        qWarning() << "Got client path" << path;
         m_clientIface = new QDBusInterface(GEOCLUE_MASTER, path, GEOCLUE_CLIENT_IFACE, QDBusConnection::systemBus());
         m_clientIface->setProperty("DesktopId", "QuickMaps");
         m_clientIface->setProperty("DistanceThreshold", 500); // in meters
@@ -65,10 +65,10 @@ void GeoLocation::init()
                                                   SLOT(slotLocationUpdated(QDBusObjectPath,QDBusObjectPath)))) {
             qCritical() << Q_FUNC_INFO << "Error connecting to location updates via dbus";
         }
-        QDBusReply<void> startReply = m_clientIface->asyncCall("Start");
-        if (!startReply.isValid()) {
-            qWarning() << Q_FUNC_INFO << "Failed to start the client" << startReply.error().message();
-        }
+//        QDBusReply<void> startReply = m_clientIface->asyncCall("Start");
+//        if (!startReply.isValid()) {
+//            qWarning() << Q_FUNC_INFO << "Failed to start the client. Msg:" << startReply.error().message();
+//        }
     } else {
         qCritical() << Q_FUNC_INFO << "Couldn't obtain valid client path";
     }

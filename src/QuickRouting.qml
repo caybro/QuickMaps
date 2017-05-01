@@ -25,7 +25,7 @@ RouteModel {
             print("Routing query returned " + count + " results")
             if (count != 0) {
                 var route = get(0)
-                map.fitViewportToGeoShape(route.bounds)
+                map.visibleRegion = route.bounds
                 print("Route measures " + route.distance + " meters and will take " + route.travelTime + " seconds")
                 messageLabel.text = qsTr("Route measures %1 and will take %2.").arg(formatMeters(route.distance)).arg(formatSeconds(route.travelTime))
                 printRoute(route)
