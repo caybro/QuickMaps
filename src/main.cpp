@@ -29,6 +29,7 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.setWindowIcon(QIcon(":/osm.png"));
     app.setOrganizationName("KDE");
     app.setOrganizationDomain("kde.org");

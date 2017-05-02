@@ -18,7 +18,7 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
-import QtLocation 5.3
+import QtLocation 5.5
 import QtPositioning 5.3
 
 Map {
@@ -29,6 +29,7 @@ Map {
     property alias markerDestination: markerDestination
     property alias homeCircle: homeCircle
 
+    copyrightsVisible: false
     onCopyrightLinkActivated: Qt.openUrlExternally(link)
 
     MouseArea {
@@ -222,7 +223,5 @@ Map {
                 return
             }
         }
-        print("Requested map style not found, trying w/o night and mobile!")
-        switchMapType(travelMode, false, false)
     }
 }

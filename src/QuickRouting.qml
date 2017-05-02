@@ -16,7 +16,7 @@
 */
 
 import QtQuick 2.4
-import QtLocation 5.3
+import QtLocation 5.5
 
 RouteModel {
     autoUpdate: true

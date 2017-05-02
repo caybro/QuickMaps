@@ -17,6 +17,7 @@
 
 import QtQuick 2.4
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import QtQuick.Layouts 1.3
 import QtQuick.Window 2.2
 import QtQuick.Dialogs 1.2
@@ -60,34 +61,34 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        print("App name/version: " + Qt.application.name + " " + Qt.application.version)
-        print("Platform: " + Qt.platform.os)
-        print("Mobile: " + mobile)
-        print("Available services: " + plugin.availableServiceProviders)
-        print("Actual mapping plugin: " + plugin.name)
-        print("Min/max zooms: " + map.minimumZoomLevel + "/" + map.maximumZoomLevel)
+        console.warn("App name/version: " + Qt.application.name + " " + Qt.application.version)
+        console.warn("Platform: " + Qt.platform.os)
+        console.warn("Mobile: " + mobile)
+        console.warn("Available services: " + plugin.availableServiceProviders)
+        console.warn("Actual mapping plugin: " + plugin.name)
+        console.warn("Min/max zooms: " + map.minimumZoomLevel + "/" + map.maximumZoomLevel)
 
-        print("\n\Here.com plugin\n--------------")
-        print("Supports online maps: " + plugin.supportsMapping(Plugin.OnlineMappingFeature))
-        print("Supports offline maps: " + plugin.supportsMapping(Plugin.OfflineMappingFeature))
-        print("Supports localized maps: " + plugin.supportsMapping(Plugin.LocalizedMappingFeature))
-        print("Supports online routing: " + plugin.supportsRouting(Plugin.OnlineRoutingFeature))
-        print("Supports offline routing: " + plugin.supportsRouting(Plugin.OfflineRoutingFeature))
-        print("Supports localized routing: " + plugin.supportsRouting(Plugin.LocalizedRoutingFeature))
-        print("Supports dynamic routing, based on current position: " + plugin.supportsRouting(Plugin.RouteUpdatesFeature))
-        print("Supports routing alternatives: " + plugin.supportsRouting(Plugin.AlternativeRoutesFeature))
+        console.warn("\n\Here.com plugin\n--------------")
+        console.warn("Supports online maps: " + plugin.supportsMapping(Plugin.OnlineMappingFeature))
+        console.warn("Supports offline maps: " + plugin.supportsMapping(Plugin.OfflineMappingFeature))
+        console.warn("Supports localized maps: " + plugin.supportsMapping(Plugin.LocalizedMappingFeature))
+        console.warn("Supports online routing: " + plugin.supportsRouting(Plugin.OnlineRoutingFeature))
+        console.warn("Supports offline routing: " + plugin.supportsRouting(Plugin.OfflineRoutingFeature))
+        console.warn("Supports localized routing: " + plugin.supportsRouting(Plugin.LocalizedRoutingFeature))
+        console.warn("Supports dynamic routing, based on current position: " + plugin.supportsRouting(Plugin.RouteUpdatesFeature))
+        console.warn("Supports routing alternatives: " + plugin.supportsRouting(Plugin.AlternativeRoutesFeature))
 
-        print("\n\nOSM plugin\n--------------")
-        print("Supports online maps: " + geocodePlugin.supportsMapping(Plugin.OnlineMappingFeature))
-        print("Supports online routing: " + geocodePlugin.supportsRouting(Plugin.OnlineRoutingFeature))
-        print("Supports dynamic routing, based on current position: " + geocodePlugin.supportsRouting(Plugin.RouteUpdatesFeature))
-        print("Supports geocoding: " + geocodePlugin.supportsGeocoding(Plugin.OnlineGeocodingFeature))
-        print("Supports reverse geocoding: " + geocodePlugin.supportsGeocoding(Plugin.ReverseGeocodingFeature))
-        print("Supports places: " + geocodePlugin.supportsPlaces(Plugin.OnlinePlacesFeature))
+        console.warn("\n\nOSM plugin\n--------------")
+        console.warn("Supports online maps: " + geocodePlugin.supportsMapping(Plugin.OnlineMappingFeature))
+        console.warn("Supports online routing: " + geocodePlugin.supportsRouting(Plugin.OnlineRoutingFeature))
+        console.warn("Supports dynamic routing, based on current position: " + geocodePlugin.supportsRouting(Plugin.RouteUpdatesFeature))
+        console.warn("Supports geocoding: " + geocodePlugin.supportsGeocoding(Plugin.OnlineGeocodingFeature))
+        console.warn("Supports reverse geocoding: " + geocodePlugin.supportsGeocoding(Plugin.ReverseGeocodingFeature))
+        console.warn("Supports places: " + geocodePlugin.supportsPlaces(Plugin.OnlinePlacesFeature))
 
         var types = QmlSensors.sensorTypes();
-        print("Supported sensors: " + types.join(", "));
-        print("Light sensor: " + lightSensor.identifier + " " + lightSensor.description)
+        console.warn("Supported sensors: " + types.join(", "));
+        console.warn("Light sensor: " + lightSensor.identifier + " " + lightSensor.description)
         if (mobile) {
             lightSensor.start()
         }
@@ -119,16 +120,16 @@ ApplicationWindow {
 
     Plugin {
         id: plugin
-        preferred: ["nokia", "osm"]
-        PluginParameter { name: "app_id"; value: "KvjgeyL7z4SoEo3WpDlr" }
-        PluginParameter { name: "token"; value: "silNtd28g7LA6L_hSDwBMQ" }
-        PluginParameter { name: "useragent"; value: "QuickMaps" }
+        preferred: ["here", "osm"]
+        PluginParameter { name: "here.app_id"; value: "KvjgeyL7z4SoEo3WpDlr" }
+        PluginParameter { name: "here.token"; value: "silNtd28g7LA6L_hSDwBMQ" }
+        PluginParameter { name: "osm.useragent"; value: "QuickMaps" }
     }
 
     Plugin {
         id: geocodePlugin
         name: "osm" // BUG the nokia geocode plugin seems to always return only 1 result...
-        PluginParameter { name: "useragent"; value: "QuickMaps" }
+        PluginParameter { name: "osm.useragent"; value: "QuickMaps" }
     }
 
     SplitView {
@@ -148,7 +149,7 @@ ApplicationWindow {
                 model: routing
                 delegate: MapRoute {
                     route: routeData
-                    line.color: "maroon"
+                    line.color: palette.highlight
                     line.width: 5
                     smooth: true
                     opacity: 0.7
@@ -173,8 +174,8 @@ ApplicationWindow {
                         Image {
                             id: image
                             source: place.icon.url()
-                            width: 48
-                            height: 48
+                            width: 24
+                            height: 24
                         }
                     }
 
@@ -259,14 +260,14 @@ ApplicationWindow {
         onStatusChanged: {
             if (status == PlaceSearchModel.Ready) {
                 searchTerm = ""
-                print ("Got " + count + " place search results")
+                console.warn("Got " + count + " place search results")
                 if (count == 1) {
                     selectPlace(data(0, "place").location)
                 } else if (count > 1) {
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
                     switchToResults()
                 } else {
-                    print ("Got no results from " + currentSearchField)
+                    console.warn("Got no results from " + currentSearchField)
                     messageLabel.text = qsTranslate("main", "Query returned %n item(s)", "", count)
                 }
 
@@ -274,7 +275,7 @@ ApplicationWindow {
                     findDirections()
                 }
             } else if (status == PlaceSearchModel.Error) {
-                print("Places search error: " + errorString())
+                console.error("Places search error:", errorString())
             }
         }
     }
@@ -667,6 +668,23 @@ ApplicationWindow {
     statusBar: StatusBar {
         id: statusBar
         visible: !fullscreenAction.checked
+        style: StatusBarStyle {
+            padding {
+                left: 8
+                right: 8
+                top: 3
+                bottom: 3
+            }
+            background: Rectangle {
+                implicitHeight: 16
+                implicitWidth: 200
+                gradient: Gradient{
+                    GradientStop{color: palette.light ; position: 0}
+                    GradientStop{color: palette.mid ; position: 1}
+                }
+            }
+        }
+
         RowLayout {
             anchors.fill: parent
             Label {
